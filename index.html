@@ -1,0 +1,1408 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>AstroNight – Decision Preview</title>
+<style>
+:root{
+  --bg:#080c13;--panel:#111824;--panel2:#0d1420;--text:#eef4ff;--muted:#8795ad;
+  --line:#202b3d;--good:#72e29b;--ok:#ffd166;--bad:#ff7d7d;--accent:#8fb8ff;
+  --accent2:#b39cff;--moon:#f5efc9;--shadow:0 18px 55px rgba(0,0,0,.22);
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  margin:0;color:var(--text);
+  font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 18% -8%,rgba(80,115,190,.24),transparent 30%),
+    radial-gradient(circle at 82% 0%,rgba(94,61,146,.14),transparent 26%),var(--bg);
+  min-height:100vh;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{width:min(1160px,calc(100% - 28px));margin:0 auto;padding:24px 0 50px}
+.top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:16px;
+}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:750}
+h1{font-size:clamp(28px,4vw,42px);line-height:1;margin:6px 0 8px;letter-spacing:-.035em}
+.sub{color:var(--muted)}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--good)}
+.live:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 14px currentColor}
+.panel{
+  background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0)),var(--panel);
+  border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+}
+.toolbar{padding:14px;margin-bottom:16px}
+.tools{display:grid;grid-template-columns:minmax(210px,1.25fr) minmax(130px,.62fr) minmax(170px,.78fr) minmax(170px,.76fr) minmax(140px,.62fr) auto;gap:10px}
+.field{position:relative}
+.input,.select,.btn{
+  width:100%;height:43px;border-radius:11px;border:1px solid var(--line);background:#0c131e;color:var(--text);
+  padding:0 12px;outline:none;
+}
+.input:focus,.select:focus{border-color:#46658f;box-shadow:0 0 0 3px rgba(143,184,255,.08)}
+.btn{width:auto;white-space:nowrap;font-weight:700;padding:0 14px}
+.btn:hover{border-color:#48668f;background:#101a29}
+.btn.primary{background:#e9f1ff;color:#0c1522;border-color:#e9f1ff}
+.btn.primary:hover{background:white}
+.searchResults{
+  display:none;position:absolute;left:0;right:0;top:48px;z-index:20;padding:5px;
+  background:#111927;border:1px solid #263349;border-radius:12px;box-shadow:0 18px 45px rgba(0,0,0,.38);
+}
+.searchResults.open{display:block}
+.result{
+  width:100%;text-align:left;border:0;background:transparent;color:var(--text);padding:10px;border-radius:8px;cursor:pointer
+}
+.result:hover{background:#182234}
+.result small{display:block;color:var(--muted);margin-top:2px}
+.status{min-height:21px;color:var(--muted);font-size:12px;margin-top:10px}
+.status.err{color:var(--bad)}
+.grid{display:grid;grid-template-columns:1.35fr .65fr;gap:16px}
+.card{padding:18px}
+.hero{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
+.scoreRing{
+  --score:70;width:122px;height:122px;border-radius:50%;
+  display:grid;place-items:center;position:relative;
+  background:conic-gradient(var(--good) calc(var(--score)*1%),#202b3b 0)
+}
+.scoreRing:after{content:"";position:absolute;inset:8px;background:var(--panel);border-radius:50%}
+.scoreIn{position:relative;z-index:2;text-align:center}
+.scoreNum{font-size:34px;font-weight:800;line-height:1}
+.scoreText{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:5px}
+.verdict{font-size:25px;font-weight:780;letter-spacing:-.025em;margin:5px 0 8px}
+.pill{
+  display:inline-flex;gap:7px;align-items:center;border-radius:999px;padding:7px 10px;
+  color:var(--good);background:#10231a;font-size:13px;font-weight:700
+}
+.pill.ok{color:var(--ok);background:#272111}
+.pill.bad{color:var(--bad);background:#2b171a}
+.explain{color:var(--muted);max-width:670px;margin:12px 0 0}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:17px}
+.metric{padding:11px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+.metric span{font-size:11px;color:var(--muted);display:block}
+.metric b{display:block;font-size:18px;margin-top:2px}
+.metric em{font-size:10px;color:var(--muted);font-style:normal}
+.moonWrap{display:flex;align-items:center;gap:16px;margin:12px 0 14px}
+.moonDisk{
+  --illum:50%;width:86px;height:86px;border-radius:50%;position:relative;overflow:hidden;
+  background:var(--moon);box-shadow:0 0 28px rgba(245,239,201,.1)
+}
+.moonDisk:after{display:none}
+.moonDisk canvas{display:block;width:100%;height:100%;border-radius:50%}
+.moonPct{font-size:28px;font-weight:780;line-height:1}
+.moonPhase{color:var(--muted);margin-top:5px}
+.rows{display:grid;gap:9px}
+.row{display:flex;justify-content:space-between;gap:20px;padding-top:9px;border-top:1px solid var(--line);color:var(--muted)}
+.row b{color:var(--text);text-align:right}
+.wide{grid-column:1/-1}
+.cardHead{display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap}
+.cardTitle{font-size:20px;font-weight:760;margin-top:4px}
+.twilight{color:var(--muted);font-size:13px}
+.twilight b{color:var(--text)}
+.timeline{overflow:auto;margin-top:12px;padding-bottom:3px}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:9px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;color:var(--muted);font-weight:650}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--panel);z-index:2}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.good{color:var(--good)} .ok{color:var(--ok)} .bad{color:var(--bad)}
+.legend{display:flex;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:10px}
+.legend span{display:flex;align-items:center;gap:6px}
+.factorGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px 20px;margin-top:13px}
+.factorTop{display:flex;justify-content:space-between;gap:15px;font-size:13px}
+.factorTop span{color:var(--muted)}
+.bar{height:8px;border-radius:999px;background:#202b3b;overflow:hidden;margin-top:7px}
+.bar i{height:100%;display:block;background:linear-gradient(90deg,var(--accent2),var(--good));border-radius:inherit}
+.note{
+  margin-top:14px;border:1px solid var(--line);background:#0d1420;border-radius:12px;padding:11px 12px;
+  color:var(--muted);font-size:12px
+}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:15px}
+.loading .panel:not(.toolbar){opacity:.62}
+.loader{display:none}
+.loading .loader{display:inline}
+
+
+.heroPills{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.confidencePill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 10px;font-size:13px;font-weight:700;border:1px solid var(--line);background:#101824;color:var(--muted)}
+.confidencePill.good{color:var(--good);background:#10231a;border-color:#1f4930}
+.confidencePill.ok{color:var(--ok);background:#272111;border-color:#4a3d17}
+.confidencePill.bad{color:var(--bad);background:#2b171a;border-color:#54262c}
+.modelGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.modelCard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px}
+.modelTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.modelName{font-weight:760}.modelMeta{font-size:10px;color:var(--muted);margin-top:2px}.modelState{font-size:11px;color:var(--muted)}
+.modelState.good{color:var(--good)}.modelState.bad{color:var(--bad)}
+.modelStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.modelStat{padding-top:8px;border-top:1px solid var(--line)}.modelStat span{display:block;font-size:10px;color:var(--muted)}.modelStat b{font-size:16px}
+.consensusBox{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#0b121d;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.consensusScore{font-size:28px;font-weight:800;min-width:58px;text-align:center}.consensusText{color:var(--muted);font-size:12px}.consensusText b{color:var(--text)}
+.range{font-variant-numeric:tabular-nums}.tiny{font-size:10px;color:var(--muted)}
+@media(max-width:850px){.modelGrid{grid-template-columns:1fr}.consensusBox{grid-template-columns:1fr}.consensusScore{text-align:left}}
+
+.targetGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:14px}
+.targetStats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.targetStat{padding:11px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+.targetStat span{font-size:11px;color:var(--muted);display:block}.targetStat b{display:block;font-size:17px;margin-top:2px}
+.targetSummary{color:var(--muted);font-size:13px;line-height:1.5}
+@media(max-width:850px){.targetGrid{grid-template-columns:1fr}.targetStats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:850px){
+  .top{display:block}.live{margin-top:10px}
+  .tools{grid-template-columns:1fr 1fr}.field:first-child{grid-column:1/-1}
+  .grid{grid-template-columns:1fr}.wide{grid-column:auto}
+}
+@media(max-width:610px){
+  .app{width:min(100% - 18px,1160px);padding-top:15px}
+  .tools{grid-template-columns:1fr}.field:first-child{grid-column:auto}
+  .hero{grid-template-columns:1fr}.scoreRing{width:102px;height:102px}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .factorGrid{grid-template-columns:1fr}
+}
+
+/* Decision layer */
+.diagnosis{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.diagChip{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:#0d1420;color:var(--muted);font-size:12px;font-weight:650}
+.diagChip.good{color:var(--good);background:#10231a;border-color:#1f4930}
+.diagChip.ok{color:var(--ok);background:#272111;border-color:#4a3d17}
+.diagChip.bad{color:var(--bad);background:#2b171a;border-color:#54262c}
+.stripWrap{margin-top:15px}
+.stripHeader{display:flex;justify-content:space-between;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:8px}
+.stripHint{font-size:11px;color:var(--muted)}
+.timelineUnified{--label-col:194px;--hour-col:100px;overflow-x:auto;margin-top:8px;padding-bottom:4px}
+.timelineUnified table{table-layout:fixed;min-width:0;width:max-content}
+.timelineUnified th:first-child,.timelineUnified td:first-child{width:var(--label-col);min-width:var(--label-col);max-width:var(--label-col)}
+.timelineUnified th:not(:first-child),.timelineUnified td:not(:first-child){width:var(--hour-col);min-width:var(--hour-col);max-width:var(--hour-col)}
+.timelineCanvas{position:relative;width:max-content;padding-top:28px}
+.nowMarker{position:absolute;top:0;bottom:0;width:1px;background:rgba(143,184,255,.9);z-index:7;pointer-events:none;box-shadow:0 0 10px rgba(143,184,255,.45)}
+.nowMarker:after{content:"";position:absolute;top:25px;left:50%;width:7px;height:7px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 12px rgba(143,184,255,.8)}
+.nowMarkerLabel{position:absolute;top:2px;left:50%;transform:translateX(-50%);padding:3px 7px;border-radius:999px;background:#dce9ff;color:#0b1420;font-size:9px;font-weight:800;white-space:nowrap;letter-spacing:.02em;box-shadow:0 4px 14px rgba(0,0,0,.28)}
+.nightStrip{display:grid;gap:0;width:max-content;padding-bottom:8px;align-items:stretch}
+.stripLabel{width:194px;min-width:194px;position:sticky;left:0;z-index:4;display:flex;align-items:center;padding:0 10px;color:var(--muted);font-size:11px;font-weight:650;background:var(--panel)}
+.hourBlock{width:92px;min-width:92px;margin:0 4px;border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:7px 5px;text-align:center;position:relative;overflow:hidden}
+.hourBlock:before{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--bad)}
+.hourBlock.good:before{background:var(--good)}.hourBlock.ok:before{background:var(--ok)}
+.hourTime{font-size:10px;color:var(--muted)}.hourScore{font-size:16px;font-weight:800;margin-top:2px}.hourMeta{font-size:9px;color:var(--muted);margin-top:2px}
+.hourBlock.best{box-shadow:0 0 0 2px rgba(143,184,255,.35) inset;border-color:#48668f}
+.targetLead{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-top:12px;margin-bottom:14px}
+.targetScoreBadge{width:86px;height:86px;border-radius:18px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;text-align:center}
+.targetScoreBadge b{font-size:29px;line-height:1}.targetScoreBadge span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.targetVerdict{font-size:18px;font-weight:780}.targetWhy{font-size:12px;color:var(--muted);margin-top:4px}
+@media(max-width:610px){.targetLead{grid-template-columns:1fr}.targetScoreBadge{width:100%;height:auto;padding:12px;display:flex;gap:9px;align-items:baseline;justify-content:center}.targetScoreBadge span{display:inline}}
+
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="top">
+    <div>
+      <div class="eyebrow">AstroNight · Time Preview</div>
+      <h1>Heute Nacht</h1>
+      <div class="sub" id="headlineLocation">Standort wählen, um die Nacht zu berechnen.</div>
+    </div>
+    <div class="live"><span id="dataState">3‑Modell-Check bereit</span></div>
+  </div>
+
+  <div class="panel toolbar">
+    <div class="tools">
+      <div class="field">
+        <input class="input" id="locationInput" autocomplete="off" placeholder="Ort oder PLZ suchen …" aria-label="Standort">
+        <div class="searchResults" id="searchResults"></div>
+      </div>
+      <select class="select" id="mode" aria-label="Astrofotografie-Modus">
+        <option value="deep">Deep Sky</option>
+        <option value="milky">Milchstraße</option>
+        <option value="moon">Mond</option>
+        <option value="planets">Planeten</option>
+      </select>
+      <select class="select" id="target" aria-label="Zielobjekt">
+        <option value="none">Kein Ziel</option>
+        <optgroup label="Galaxien">
+          <option value="M31">M31 · Andromedagalaxie</option>
+          <option value="M33">M33 · Dreiecksgalaxie</option>
+          <option value="M51">M51 · Whirlpool-Galaxie</option>
+          <option value="M63">M63 · Sonnenblumen-Galaxie</option>
+          <option value="M64">M64 · Black-Eye-Galaxie</option>
+          <option value="M65">M65 · Leo-Triplett</option>
+          <option value="M66">M66 · Leo-Triplett</option>
+          <option value="M81">M81 · Bodes Galaxie</option>
+          <option value="M82">M82 · Zigarrengalaxie</option>
+          <option value="M101">M101 · Feuerradgalaxie</option>
+          <option value="M104">M104 · Sombrerogalaxie</option>
+          <option value="M106">M106 · Jagdhunde</option>
+          <option value="NGC253">NGC 253 · Sculptor-Galaxie</option>
+        </optgroup>
+        <optgroup label="Emissions-, planetarische Nebel &amp; SNR">
+          <option value="M1">M1 · Krebsnebel</option>
+          <option value="M8">M8 · Lagunennebel</option>
+          <option value="M16">M16 · Adlernebel</option>
+          <option value="M17">M17 · Omeganebel</option>
+          <option value="M20">M20 · Trifidnebel</option>
+          <option value="M27">M27 · Hantelnebel</option>
+          <option value="M42">M42 · Orionnebel</option>
+          <option value="M57">M57 · Ringnebel</option>
+          <option value="M76">M76 · Kleiner Hantelnebel</option>
+          <option value="M97">M97 · Eulennebel</option>
+          <option value="NGC6960">NGC 6960 · Cirrusnebel West</option>
+          <option value="NGC6992">NGC 6992 · Cirrusnebel Ost</option>
+          <option value="NGC7000">NGC 7000 · Nordamerikanebel</option>
+          <option value="IC5070">IC 5070 · Pelikannebel</option>
+          <option value="NGC1499">NGC 1499 · Kaliforniennebel</option>
+          <option value="IC1805">IC 1805 · Herznebel</option>
+          <option value="IC1848">IC 1848 · Seelennebel</option>
+          <option value="NGC281">NGC 281 · Pacman-Nebel</option>
+          <option value="NGC2237">NGC 2237 · Rosettennebel</option>
+          <option value="IC434">IC 434 · Pferdekopfregion</option>
+          <option value="NGC2024">NGC 2024 · Flammennebel</option>
+          <option value="NGC2264">NGC 2264 · Konusnebel / Weihnachtsbaum</option>
+          <option value="NGC6888">NGC 6888 · Crescentnebel</option>
+          <option value="NGC7635">NGC 7635 · Blasennebel</option>
+          <option value="NGC7380">NGC 7380 · Wizard-Nebel</option>
+          <option value="NGC7822">NGC 7822 · Cepheus-Nebelregion</option>
+          <option value="IC1396">IC 1396 · Elefantenrüsselregion</option>
+          <option value="SH2101">Sh2-101 · Tulpennebel</option>
+        </optgroup>
+        <optgroup label="Reflexionsnebel &amp; helle Sternfelder">
+          <option value="M45">M45 · Plejaden</option>
+          <option value="M78">M78 · Reflexionsnebel</option>
+          <option value="NGC7023">NGC 7023 · Irisnebel</option>
+        </optgroup>
+        <optgroup label="Kugelsternhaufen">
+          <option value="M3">M3</option>
+          <option value="M5">M5</option>
+          <option value="M13">M13 · Herkuleshaufen</option>
+          <option value="M15">M15</option>
+          <option value="M92">M92</option>
+        </optgroup>
+        <optgroup label="Offene Sternhaufen">
+          <option value="M11">M11 · Wildentenhaufen</option>
+          <option value="M35">M35</option>
+          <option value="M36">M36</option>
+          <option value="M37">M37</option>
+          <option value="M38">M38</option>
+          <option value="M44">M44 · Praesepe</option>
+          <option value="M46">M46</option>
+          <option value="M47">M47</option>
+          <option value="M52">M52</option>
+          <option value="M103">M103</option>
+          <option value="DOUBLECLUSTER">NGC 869/884 · Doppelhaufen h/χ</option>
+        </optgroup>
+      </select>
+      <select class="select" id="filter" aria-label="Aufnahmefilter" title="Der Filter verändert nur den Mondeinfluss, nicht Wolken oder Niederschlag.">
+        <option value="broadband">Broadband / kein Filter</option>
+        <option value="lp">LP / CLS Filter</option>
+        <option value="dual">Dual-Narrowband · Hα + OIII</option>
+        <option value="ha">Hα Narrowband</option>
+        <option value="oiii">OIII Narrowband</option>
+        <option value="sii">SII Narrowband</option>
+      </select>
+      <input class="input" type="date" id="nightDate" aria-label="Datum">
+      <button class="btn primary" id="locateBtn">⌖ Mein Standort</button>
+    </div>
+    <div class="status" id="status">Tipp: Ort eintippen und aus der Trefferliste auswählen.</div>
+  </div>
+
+  <main class="grid" id="dashboard">
+    <section class="panel card">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">Gesamtbewertung der Nacht</div>
+          <div class="verdict" id="verdict">Noch keine Daten</div>
+          <div class="heroPills"><div class="pill ok" id="bestWindow">Bestes Fenster wird berechnet</div><div class="confidencePill ok" id="forecastConfidence">Prognosesicherheit wird berechnet</div></div>
+          <p class="explain" id="explain">Der Nacht-Score bewertet die gesamte dunkle Nacht. Das beste Fenster wird separat ausgewiesen; Wolken und heller Mond können den Score hart begrenzen.</p>
+          <div class="diagnosis" id="diagnosis"><span class="diagChip ok">Bewertung wird berechnet …</span></div>
+        </div>
+        <div class="scoreRing" id="scoreRing">
+          <div class="scoreIn"><div class="scoreNum" id="scoreNum">–</div><div class="scoreText">Nacht-Score</div></div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><span>Wolken</span><b id="mCloud">–</b><em>konservativer Konsens</em></div>
+        <div class="metric"><span>Wind</span><b id="mWind">–</b><em>10 m</em></div>
+        <div class="metric"><span>Luftfeuchte</span><b id="mHum">–</b><em>Tau-Risiko</em></div>
+        <div class="metric"><span>Temperatur / Taupunkt</span><b id="mDew">–</b><em>Abstand</em></div>
+        <div class="metric"><span>Niederschlagsrisiko</span><b id="mPrecip">–</b><em>aus Modellkonsens</em></div>
+      </div>
+    </section>
+
+    <section class="panel card">
+      <div class="eyebrow">Mond</div>
+      <div class="moonWrap">
+        <div class="moonDisk" id="moonDisk"></div>
+        <div><div class="moonPct" id="moonPct">–</div><div class="moonPhase" id="moonPhase">–</div></div>
+      </div>
+      <div class="rows">
+        <div class="row"><span>Aufgang</span><b id="moonRise">–</b></div>
+        <div class="row"><span>Untergang</span><b id="moonSet">–</b></div>
+        <div class="row"><span>Höhe um Mitternacht</span><b id="moonAlt">–</b></div>
+        <div class="row"><span>Mondlicht im besten Fenster</span><b id="moonImpact">–</b></div>
+      </div>
+    </section>
+
+
+
+    <section class="panel card wide">
+      <div class="cardHead">
+        <div><div class="eyebrow">Prognosesicherheit</div><div class="cardTitle">Was sagen die Modelle?</div></div>
+        <div class="confidencePill ok" id="modelConfidenceBadge">Konsens wird berechnet</div>
+      </div>
+      <div class="modelGrid" id="modelGrid">
+        <div class="modelCard" data-model="arome">
+          <div class="modelTop"><div><div class="modelName">GeoSphere AROME</div><div class="modelMeta">Österreich · hochauflösend</div></div><div class="modelState" id="modelState_arome">–</div></div>
+          <div class="modelStats"><div class="modelStat"><span>Wolken</span><b id="modelCloud_arome">–</b></div><div class="modelStat"><span>Niederschlag max.</span><b id="modelRain_arome">–</b></div></div>
+        </div>
+        <div class="modelCard" data-model="icon">
+          <div class="modelTop"><div><div class="modelName">DWD ICON</div><div class="modelMeta">Mitteleuropa · unabhängig</div></div><div class="modelState" id="modelState_icon">–</div></div>
+          <div class="modelStats"><div class="modelStat"><span>Wolken</span><b id="modelCloud_icon">–</b></div><div class="modelStat"><span>Niederschlag max.</span><b id="modelRain_icon">–</b></div></div>
+        </div>
+        <div class="modelCard" data-model="ecmwf">
+          <div class="modelTop"><div><div class="modelName">ECMWF IFS</div><div class="modelMeta">Global · Referenzmodell</div></div><div class="modelState" id="modelState_ecmwf">–</div></div>
+          <div class="modelStats"><div class="modelStat"><span>Wolken</span><b id="modelCloud_ecmwf">–</b></div><div class="modelStat"><span>Niederschlag max.</span><b id="modelRain_ecmwf">–</b></div></div>
+        </div>
+      </div>
+      <div class="consensusBox"><div class="consensusScore" id="consensusScore">–</div><div class="consensusText" id="consensusText"><b>Noch keine Daten.</b><br>Je größer die Streuung zwischen den Modellen, desto vorsichtiger wird der Astro-Score.</div></div>
+      <div class="note">Die Wolkenzahl im Astro-Score ist absichtlich konservativ: Der Mittelwert wird in Richtung des wolkigsten verfügbaren Modells verschoben. Niederschlagsrisiko wird aus Modellübereinstimmung und vorhergesagter Niederschlagsmenge abgeleitet.</div>
+    </section>
+
+    <section class="panel card wide">
+      <div class="cardHead">
+        <div><div class="eyebrow">Nachtverlauf</div><div class="cardTitle">Wetter + Mond + Dunkelheit</div></div>
+        <div class="twilight">Astronomische Nacht: <b id="astroNight">–</b></div>
+      </div>
+      <div class="stripWrap">
+        <div class="stripHeader"><div class="tiny">Schnellansicht der nutzbaren Stunden</div><div class="stripHint">Zahl = Stunden-Score · Rand = bestes Fenster</div></div>
+      </div>
+      <div class="timeline timelineUnified" id="timelineViewport">
+        <div class="timelineCanvas" id="timelineCanvas">
+          <div class="nowMarker" id="nowMarker" style="display:none"><span class="nowMarkerLabel" id="nowMarkerLabel">Jetzt</span></div>
+          <div class="nightStrip" id="nightStrip"></div>
+          <table id="timelineTable">
+          <thead><tr id="timeHead"><th>Zeit</th></tr></thead>
+          <tbody>
+            <tr id="cloudRow"><td>Wolken Konsens %</td></tr>
+            <tr id="spreadRow"><td>Modellspanne</td></tr>
+            <tr id="layersRow"><td>H/M/T Wolken</td></tr>
+            <tr id="windRow"><td>Wind km/h</td></tr>
+            <tr id="precipRow"><td>Niederschlag %</td></tr>
+            <tr id="humidityRow"><td>Feuchte %</td></tr>
+            <tr id="moonRow"><td>Mondhöhe</td></tr>
+            <tr id="darkRow"><td>Dunkelheit</td></tr>
+            <tr id="confidenceRow"><td>Sicherheit</td></tr>
+            <tr id="scoreRow"><td>Astro</td></tr>
+          </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--good)"></i>75–100 sehr gut</span>
+        <span><i class="dot" style="background:var(--ok)"></i>50–74 brauchbar</span>
+        <span><i class="dot" style="background:var(--bad)"></i>unter 50 ungünstig</span>
+        <span>Modellspanne = niedrigster–höchster Wolkenwert</span>
+      </div>
+    </section>
+
+    <section class="panel card wide" id="targetCard" style="display:none">
+      <div class="cardHead">
+        <div><div class="eyebrow">Zielplanung</div><div class="cardTitle" id="targetName">–</div></div>
+        <div class="twilight">Bestes Zielfenster: <b id="targetWindow">–</b></div>
+      </div>
+      <div class="targetLead">
+        <div class="targetScoreBadge"><div><b id="targetScore">–</b><span>Ziel-Score</span></div></div>
+        <div><div class="targetVerdict" id="targetVerdict">Zielbewertung wird berechnet</div><div class="targetWhy" id="targetWhy">–</div></div>
+      </div>
+      <div class="targetGrid">
+        <div class="targetStats">
+          <div class="targetStat"><span>Max. Höhe</span><b id="targetMaxAlt">–</b></div>
+          <div class="targetStat"><span>Kulmination</span><b id="targetTransit">–</b></div>
+          <div class="targetStat"><span>Mondabstand</span><b id="targetMoonSep">–</b></div>
+          <div class="targetStat"><span>Über 30°</span><b id="targetAbove30">–</b></div>
+        </div>
+        <div class="targetSummary" id="targetSummary">–</div>
+      </div>
+    </section>
+
+    <section class="panel card wide">
+      <div class="eyebrow">Score-Erklärung</div>
+      <div class="cardTitle">Was begrenzt die Nacht?</div>
+      <div class="factorGrid">
+        <div><div class="factorTop"><span>Bewölkung</span><b id="fCloud">–</b></div><div class="bar"><i id="bCloud" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Mondlicht</span><b id="fMoon">–</b></div><div class="bar"><i id="bMoon" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Wind</span><b id="fWind">–</b></div><div class="bar"><i id="bWind" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Feuchte / Tau</span><b id="fDew">–</b></div><div class="bar"><i id="bDew" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Dunkelheit</span><b id="fDark">–</b></div><div class="bar"><i id="bDark" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Sichtweite</span><b id="fVis">–</b></div><div class="bar"><i id="bVis" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Niederschlag</span><b id="fPrecip">–</b></div><div class="bar"><i id="bPrecip" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Modellkonsens</span><b id="fConsensus">–</b></div><div class="bar"><i id="bConsensus" style="width:0"></i></div></div>
+      </div>
+      <div class="note">
+        Der Astro-Score ist bewusst eine verständliche Heuristik, kein wissenschaftlicher „Seeing“-Forecast.
+        Für echtes Seeing wären zusätzliche Atmosphärenprofile bzw. spezialisierte Modelle nötig.
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">Wettermodelle via Open‑Meteo · GeoSphere AROME + DWD ICON + ECMWF IFS · konservative Nacht- und Zielbewertung · Filter-/Mond-Modell · Sonne/Mond: SunCalc</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
+<script>
+(() => {
+"use strict";
+
+const $ = id => document.getElementById(id);
+const app = $("app");
+const statusEl = $("status");
+const resultsEl = $("searchResults");
+const locationInput = $("locationInput");
+const nightDate = $("nightDate");
+const modeEl = $("mode");
+const targetEl = $("target");
+const filterEl = $("filter");
+
+let place = null;
+let weather = null;
+let modelWeather = [];
+let searchTimer = null;
+let currentNightHours = [];
+
+const pad = n => String(n).padStart(2,"0");
+const clamp = (x,a=0,b=100) => Math.max(a,Math.min(b,x));
+const rad2deg = r => r * 180 / Math.PI;
+
+function todayISO(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+nightDate.value = todayISO();
+nightDate.min = todayISO();
+const maxD = new Date(); maxD.setDate(maxD.getDate()+6);
+nightDate.max = `${maxD.getFullYear()}-${pad(maxD.getMonth()+1)}-${pad(maxD.getDate())}`;
+
+function setStatus(msg, err=false){
+  statusEl.textContent = msg;
+  statusEl.className = "status" + (err ? " err" : "");
+}
+function setLoading(on){
+  app.classList.toggle("loading",on);
+  $("dataState").textContent = on ? "Modelle werden geladen …" : "Multi‑Modell-Daten";
+}
+function fmtPlace(p){
+  return [p.name,p.admin1,p.country].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(", ");
+}
+function localDateString(date, tz){
+  return new Intl.DateTimeFormat("de-AT",{timeZone:tz,year:"numeric",month:"2-digit",day:"2-digit"}).format(date);
+}
+function localTime(date, tz){
+  if(!date || isNaN(date)) return "–";
+  return new Intl.DateTimeFormat("de-AT",{timeZone:tz,hour:"2-digit",minute:"2-digit",hour12:false}).format(date);
+}
+function localWeekday(date,tz){
+  return new Intl.DateTimeFormat("de-AT",{timeZone:tz,weekday:"long",day:"2-digit",month:"2-digit"}).format(date);
+}
+function toInstant(localISO, offsetSec){
+  const [d,t="00:00"] = localISO.split("T");
+  const [y,m,day] = d.split("-").map(Number);
+  const [h,min=0] = t.split(":").map(Number);
+  return new Date(Date.UTC(y,m-1,day,h,min) - offsetSec*1000);
+}
+function datePlus(iso, days){
+  const [y,m,d]=iso.split("-").map(Number);
+  const x=new Date(Date.UTC(y,m-1,d+days));
+  return `${x.getUTCFullYear()}-${pad(x.getUTCMonth()+1)}-${pad(x.getUTCDate())}`;
+}
+function phaseName(p){
+  if(p < .03 || p > .97) return "Neumond";
+  if(p < .22) return "zunehmende Sichel";
+  if(p < .28) return "erstes Viertel";
+  if(p < .47) return "zunehmender Mond";
+  if(p < .53) return "Vollmond";
+  if(p < .72) return "abnehmender Mond";
+  if(p < .78) return "letztes Viertel";
+  return "abnehmende Sichel";
+}
+
+function renderMoonDisk(phase){
+  const host=$("moonDisk");
+  if(!host) return;
+  let canvas=host.querySelector("canvas");
+  if(!canvas){
+    canvas=document.createElement("canvas");
+    canvas.setAttribute("aria-hidden","true");
+    host.appendChild(canvas);
+  }
+
+  // Render at 3× resolution for a smooth terminator. SunCalc phase:
+  // 0=new, .25=first quarter, .5=full, .75=last quarter.
+  const size=258, r=size/2-2, cx=size/2, cy=size/2;
+  if(canvas.width!==size || canvas.height!==size){canvas.width=size;canvas.height=size}
+  const ctx=canvas.getContext("2d");
+  const img=ctx.createImageData(size,size);
+  const data=img.data;
+  const theta=2*Math.PI*phase;
+  const sx=Math.sin(theta);
+  const sz=-Math.cos(theta);
+  const light=[245,239,201], dark=[25,33,46];
+
+  for(let py=0;py<size;py++){
+    const y=(cy-(py+.5))/r;
+    for(let px=0;px<size;px++){
+      const x=((px+.5)-cx)/r;
+      const rr=x*x+y*y;
+      const i=(py*size+px)*4;
+      if(rr>1){data[i+3]=0;continue}
+      const z=Math.sqrt(Math.max(0,1-rr));
+      const sunDot=x*sx+z*sz;
+      // A tiny soft zone around the terminator keeps the edge anti-aliased.
+      const t=Math.max(0,Math.min(1,(sunDot+.018)/.036));
+      const limb=Math.max(.82,Math.pow(z,.10));
+      data[i]=Math.round((dark[0]*(1-t)+light[0]*t)*limb);
+      data[i+1]=Math.round((dark[1]*(1-t)+light[1]*t)*limb);
+      data[i+2]=Math.round((dark[2]*(1-t)+light[2]*t)*limb);
+      data[i+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+}
+function darknessName(alt){
+  if(alt <= -18) return "astro";
+  if(alt <= -12) return "naut.";
+  if(alt <= -6) return "zivil";
+  return "hell";
+}
+function darkScore(alt){
+  if(alt <= -18) return 100;
+  if(alt <= -12) return 70 + (-alt-12)/6*30;
+  if(alt <= -6) return 25 + (-alt-6)/6*45;
+  if(alt <= 0) return Math.max(0,25 + (-alt)/6*25);
+  return 0;
+}
+function cloudScore(c){ return clamp(100-c); }
+function precipScore(p){
+  if(p<=5) return 100;
+  if(p<=20) return 100-(p-5)*2.5;
+  if(p<=50) return 62.5-(p-20)*1.75;
+  return clamp(10-(p-50)*0.2);
+}
+function windScore(w,g){
+  const base = w<=5 ? 100 : 100-(w-5)*4;
+  const gustPenalty = Math.max(0,(g-20)*1.8);
+  return clamp(base-gustPenalty);
+}
+function dewScore(temp,dew,hum){
+  const gap=temp-dew;
+  const gapScore = gap>=6?100:gap>=3?65+(gap-3)/3*35:gap>=1?25+(gap-1)/2*40:Math.max(0,gap*25);
+  const humScore = hum<=65?100:clamp(100-(hum-65)*2.5);
+  return .7*gapScore+.3*humScore;
+}
+function visibilityScore(v){
+  if(v == null || !isFinite(v)) return 70;
+  const km=v/1000;
+  if(km>=30) return 100;
+  if(km>=15) return 70+(km-15)*2;
+  if(km>=5) return 30+(km-5)*4;
+  return clamp(km*6);
+}
+const FILTER_PROFILES={
+  broadband:{label:"Broadband",moonFactor:1.00,targetMax:88},
+  lp:{label:"LP / CLS",moonFactor:.82,targetMax:89},
+  dual:{label:"Dual-Narrowband",moonFactor:.32,targetMax:90},
+  ha:{label:"Hα",moonFactor:.15,targetMax:92},
+  oiii:{label:"OIII",moonFactor:.45,targetMax:88},
+  sii:{label:"SII",moonFactor:.20,targetMax:91}
+};
+function currentFilter(){return FILTER_PROFILES[filterEl?.value]||FILTER_PROFILES.broadband}
+function relaxedMoonCap(base,profile,max=95){return base+(max-base)*(1-profile.moonFactor)}
+function moonScore(mode, illum, alt, filterKey="broadband"){
+  if(mode==="planets") return 100;
+  if(mode==="moon"){
+    if(alt < 5) return 10;
+    const altS = clamp((alt-5)/35*100);
+    return clamp(35 + .45*altS + .2*(illum*100));
+  }
+  if(alt <= 0) return 100;
+  const profile=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
+  const above = clamp(Math.sin(alt*Math.PI/180));
+  const penalty = illum*100*(.35+.65*above)*(mode==="milky"?1.15:1)*profile.moonFactor;
+  return clamp(100-penalty);
+}
+function weights(mode){
+  if(mode==="milky") return {cloud:.29,wind:.08,dew:.08,moon:.22,dark:.17,vis:.05,precip:.11};
+  if(mode==="moon")  return {cloud:.35,wind:.16,dew:.10,moon:.16,dark:.03,vis:.06,precip:.14};
+  if(mode==="planets")return {cloud:.34,wind:.20,dew:.10,moon:.02,dark:.07,vis:.10,precip:.17};
+  return {cloud:.30,wind:.11,dew:.10,moon:.17,dark:.14,vis:.05,precip:.13};
+}
+function scoreHour(h, mode, illum, filterKey="broadband"){
+  const confidence=Number.isFinite(h.confidence)?h.confidence:55;
+  const fs = {
+    cloud:cloudScore(h.cloud),
+    wind:windScore(h.wind,h.gust),
+    dew:dewScore(h.temp,h.dew,h.humidity),
+    moon:moonScore(mode,illum,h.moonAlt,filterKey),
+    dark:darkScore(h.sunAlt),
+    vis:visibilityScore(h.visibility),
+    precip:precipScore(h.precip),
+    consensus:confidence
+  };
+  const w=weights(mode);
+  let total=Object.keys(w).reduce((sum,k)=>sum+fs[k]*w[k],0);
+
+  // Bewusst konservativ: Unsicherheit kostet Punkte; Wolken/Regen sind harte Limits.
+  total -= (100-confidence)*0.18;
+  if(h.cloud>=80) total=Math.min(total,8);
+  else if(h.cloud>=60) total=Math.min(total,20);
+  else if(h.cloud>=40) total=Math.min(total,35);
+  else if(h.cloud>=25) total=Math.min(total,52);
+  else if(h.cloud>=15) total=Math.min(total,68);
+
+  if(h.precip>=70) total=Math.min(total,10);
+  else if(h.precip>=50) total=Math.min(total,22);
+  else if(h.precip>=30) total=Math.min(total,42);
+  else if(h.precip>=15) total=Math.min(total,60);
+  if((h.wetModels||0)>=2 && (h.maxPrecipMm||0)>=0.2) total=Math.min(total,35);
+
+  // Heller Mond ist für Deep Sky / Milchstraße kein normaler gewichteter Faktor,
+  // sondern kann die grundsätzlich erreichbare Bildqualität begrenzen.
+  const filterProfile=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
+  if(mode==="deep" && h.moonAlt>0){
+    if(illum>=0.90) total=Math.min(total,relaxedMoonCap(h.moonAlt>=20?28:36,filterProfile));
+    else if(illum>=0.75) total=Math.min(total,relaxedMoonCap(h.moonAlt>=20?40:48,filterProfile));
+    else if(illum>=0.55 && h.moonAlt>=20) total=Math.min(total,relaxedMoonCap(58,filterProfile));
+  }
+  if(mode==="milky" && h.moonAlt>0){
+    if(illum>=0.75) total=Math.min(total,relaxedMoonCap(22,filterProfile,90));
+    else if(illum>=0.50) total=Math.min(total,relaxedMoonCap(38,filterProfile,92));
+  }
+
+  // Wolken bleiben immer ein KO-Faktor. Ein Narrowbandfilter reduziert nur den
+  // zusätzlichen Streulichtanteil des Mondes, niemals die Wolkenstrafe selbst.
+  if((mode==="deep" || mode==="milky") && illum>=0.80 && h.moonAlt>0){
+    if(h.cloud>=50) total=Math.min(total,relaxedMoonCap(12,filterProfile));
+    else if(h.cloud>=25) total=Math.min(total,relaxedMoonCap(24,filterProfile));
+  }
+  return {...fs,total:clamp(total)};
+}
+function colorClass(s){return s>=75?"good":s>=50?"ok":"bad"}
+function quality(s){return s>=85?"sehr gut":s>=70?"gut":s>=50?"mittel":s>=30?"schwach":"schlecht"}
+function confidenceName(s){return s>=75?"hoch":s>=50?"mittel":"niedrig"}
+function confidenceClass(s){return s>=75?"good":s>=50?"ok":"bad"}
+
+async function searchPlaces(q){
+  if(q.trim().length<2){resultsEl.classList.remove("open");return}
+  try{
+    const url=`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=de&format=json`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error("Standortsuche nicht erreichbar");
+    const data=await r.json();
+    resultsEl.innerHTML="";
+    (data.results||[]).forEach(p=>{
+      const b=document.createElement("button");
+      b.className="result";
+      b.innerHTML=`<strong>${p.name}</strong><small>${[p.admin1,p.country].filter(Boolean).join(" · ")}${p.elevation!=null?` · ${Math.round(p.elevation)} m`:""}</small>`;
+      b.onclick=()=>choosePlace(p);
+      resultsEl.appendChild(b);
+    });
+    resultsEl.classList.toggle("open",(data.results||[]).length>0);
+  }catch(e){setStatus(e.message,true)}
+}
+function choosePlace(p){
+  place=p;
+  locationInput.value=fmtPlace(p);
+  resultsEl.classList.remove("open");
+  localStorage.setItem("astroNightPlace",JSON.stringify(p));
+  loadWeather();
+}
+async function reversePlace(lat,lon){
+  // Open-Meteo geocoding has no reverse endpoint; keep a readable coordinate label.
+  return {name:"Mein Standort",latitude:lat,longitude:lon,timezone:"auto"};
+}
+
+const MODEL_CONFIGS=[
+  {key:"arome",name:"GeoSphere AROME",ids:["geosphere_arome","geosphere_seamless"],weight:1.35},
+  {key:"icon",name:"DWD ICON",ids:["icon_seamless","icon_eu"],weight:1.10},
+  {key:"ecmwf",name:"ECMWF IFS",ids:["ecmwf_ifs025","ecmwf_ifs"],weight:1.00}
+];
+const WEATHER_VARS=[
+  "temperature_2m","relative_humidity_2m","dew_point_2m","precipitation",
+  "cloud_cover","cloud_cover_low","cloud_cover_mid","cloud_cover_high","visibility",
+  "wind_speed_10m","wind_gusts_10m"
+];
+function finite(v){return Number.isFinite(Number(v))?Number(v):NaN}
+function mean(a){const x=a.filter(Number.isFinite);return x.length?x.reduce((p,c)=>p+c,0)/x.length:NaN}
+function weightedMean(items){
+  const x=items.filter(o=>Number.isFinite(o.value)&&Number.isFinite(o.weight));
+  const sw=x.reduce((p,o)=>p+o.weight,0);return sw?x.reduce((p,o)=>p+o.value*o.weight,0)/sw:NaN;
+}
+async function fetchOneModel(cfg){
+  let lastError=null;
+  for(const modelId of cfg.ids){
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&hourly=${WEATHER_VARS.join(",")}&models=${modelId}&timezone=auto&forecast_days=7`;
+      const r=await fetch(url);
+      if(!r.ok){lastError=new Error(`${r.status}`);continue}
+      const data=await r.json();
+      if(!data.hourly?.time?.length){lastError=new Error("keine Daten");continue}
+      const index=new Map(data.hourly.time.map((t,i)=>[t,i]));
+      return {...cfg,modelId,data,index,available:true};
+    }catch(e){lastError=e}
+  }
+  return {...cfg,available:false,error:lastError?.message||"nicht verfügbar"};
+}
+async function fetchBestMatchFallback(){
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&hourly=${WEATHER_VARS.join(",")}&timezone=auto&forecast_days=7`;
+  const r=await fetch(url); if(!r.ok) throw new Error(`Wetterdienst antwortet mit ${r.status}`);
+  const data=await r.json();
+  return {key:"fallback",name:"Open‑Meteo Best Match",weight:1,modelId:"best_match",data,index:new Map(data.hourly.time.map((t,i)=>[t,i])),available:true,fallback:true};
+}
+function modelValue(m,stamp,key){
+  if(!m?.available)return NaN;const i=m.index.get(stamp);if(i==null)return NaN;return finite(m.data.hourly[key]?.[i]);
+}
+function buildConsensus(models){
+  const active=models.filter(m=>m.available);
+  const stamps=[...new Set(active.flatMap(m=>m.data.hourly.time||[]))].sort();
+  const hourly={time:[],temperature_2m:[],relative_humidity_2m:[],dew_point_2m:[],precipitation_probability:[],precipitation:[],cloud_cover:[],cloud_cover_low:[],cloud_cover_mid:[],cloud_cover_high:[],visibility:[],wind_speed_10m:[],wind_gusts_10m:[],cloud_min:[],cloud_max:[],confidence:[],wet_model_count:[],model_count:[],precipitation_max:[]};
+  const details={};
+  for(const stamp of stamps){
+    const rows=active.map(m=>({m,
+      cloud:modelValue(m,stamp,"cloud_cover"),low:modelValue(m,stamp,"cloud_cover_low"),mid:modelValue(m,stamp,"cloud_cover_mid"),high:modelValue(m,stamp,"cloud_cover_high"),
+      temp:modelValue(m,stamp,"temperature_2m"),hum:modelValue(m,stamp,"relative_humidity_2m"),dew:modelValue(m,stamp,"dew_point_2m"),
+      rain:modelValue(m,stamp,"precipitation"),vis:modelValue(m,stamp,"visibility"),wind:modelValue(m,stamp,"wind_speed_10m"),gust:modelValue(m,stamp,"wind_gusts_10m")
+    })).filter(r=>Number.isFinite(r.cloud));
+    if(!rows.length)continue;
+    const vals=k=>rows.map(r=>r[k]).filter(Number.isFinite);
+    const wm=k=>weightedMean(rows.map(r=>({value:r[k],weight:r.m.weight})));
+    const cloudVals=vals("cloud"), cloudMin=Math.min(...cloudVals), cloudMax=Math.max(...cloudVals), cloudMean=wm("cloud");
+    const cloudRisk=clamp(.55*cloudMean+.45*cloudMax);
+    const conservativeLayer=k=>{const a=vals(k);return a.length?clamp(.65*wm(k)+.35*Math.max(...a)):0};
+    const windVals=vals("wind"), windMean=wm("wind"), windMax=windVals.length?Math.max(...windVals):windMean;
+    const rainVals=vals("rain").map(x=>Math.max(0,x)), wet=rainVals.filter(x=>x>=0.1).length, modelCount=rows.length, maxRain=rainVals.length?Math.max(...rainVals):0;
+    let rainRisk=maxRain<0.05?0:clamp((wet/modelCount)*75+Math.min(25,maxRain*20));
+    const cloudRange=cloudMax-cloudMin;
+    const windRange=windVals.length?Math.max(...windVals)-Math.min(...windVals):0;
+    const mixedRain=wet>0&&wet<modelCount?20:0;
+    const missingPenalty=Math.max(0,3-modelCount)*12;
+    const confidence=clamp(100-cloudRange*.78-Math.min(18,windRange*1.25)-mixedRain-missingPenalty,5,100);
+    const visVals=vals("vis"), visMean=wm("vis"), visMin=visVals.length?Math.min(...visVals):visMean;
+    const temp=wm("temp"), humVals=vals("hum"), humMean=wm("hum"), humMax=humVals.length?Math.max(...humVals):humMean;
+    const dew=wm("dew");
+    const gustVals=vals("gust"), gust=gustVals.length?Math.max(...gustVals):windMax;
+    const values={}; rows.forEach(r=>values[r.m.key]={cloud:r.cloud,rain:Number.isFinite(r.rain)?r.rain:0,wind:r.wind});
+    hourly.time.push(stamp);hourly.temperature_2m.push(temp);hourly.relative_humidity_2m.push(.65*humMean+.35*humMax);hourly.dew_point_2m.push(dew);
+    hourly.precipitation_probability.push(rainRisk);hourly.precipitation.push(mean(rainVals));hourly.cloud_cover.push(cloudRisk);hourly.cloud_cover_low.push(conservativeLayer("low"));hourly.cloud_cover_mid.push(conservativeLayer("mid"));hourly.cloud_cover_high.push(conservativeLayer("high"));
+    hourly.visibility.push(Number.isFinite(visMean)?(.6*visMean+.4*visMin):NaN);hourly.wind_speed_10m.push(Number.isFinite(windMean)?(.7*windMean+.3*windMax):NaN);hourly.wind_gusts_10m.push(gust);
+    hourly.cloud_min.push(cloudMin);hourly.cloud_max.push(cloudMax);hourly.confidence.push(confidence);hourly.wet_model_count.push(wet);hourly.model_count.push(modelCount);hourly.precipitation_max.push(maxRain);
+    details[stamp]={values,cloudMean,cloudMin,cloudMax,cloudRisk,confidence,wet,modelCount,maxRain};
+  }
+  const ref=active.find(m=>m.key==="ecmwf")||active[0];
+  return {latitude:place.latitude,longitude:place.longitude,timezone:ref.data.timezone||place.timezone||"UTC",utc_offset_seconds:ref.data.utc_offset_seconds||0,hourly,details};
+}
+async function loadWeather(){
+  if(!place) return;
+  setLoading(true); setStatus("AROME, ICON und ECMWF werden verglichen …");
+  try{
+    modelWeather=await Promise.all(MODEL_CONFIGS.map(fetchOneModel));
+    if(!modelWeather.some(m=>m.available)) modelWeather=[await fetchBestMatchFallback()];
+    weather=buildConsensus(modelWeather);
+    if(!weather.hourly?.time?.length) throw new Error("Keine gemeinsamen stündlichen Wetterdaten erhalten.");
+    render();
+    const n=modelWeather.filter(m=>m.available&&!m.fallback).length;
+    setStatus(`Aktualisiert · ${fmtPlace(place)} · ${n||1} Wettermodell${n===1?"":"e"} · konservative Konsensbewertung`);
+  }catch(e){
+    setStatus(`Fehler: ${e.message}. Internetverbindung prüfen.`,true);
+  }finally{setLoading(false)}
+}
+
+function buildNightHours(){
+  const date=nightDate.value;
+  const next=datePlus(date,1);
+  const H=weather.hourly;
+  const offset=weather.utc_offset_seconds||0;
+  const arr=[];
+  const noon=toInstant(date+"T12:00",offset);
+  const nextNoon=toInstant(next+"T12:00",offset);
+  const t1=SunCalc.getTimes(noon,place.latitude,place.longitude);
+  const t2=SunCalc.getTimes(nextNoon,place.latitude,place.longitude);
+  const fallbackStart=toInstant(date+"T16:00",offset), fallbackEnd=toInstant(next+"T09:00",offset);
+  const start=(t1.sunset && !isNaN(t1.sunset))?new Date(t1.sunset.getTime()-3600000):fallbackStart;
+  const end=(t2.sunrise && !isNaN(t2.sunrise))?new Date(t2.sunrise.getTime()+3600000):fallbackEnd;
+  for(let i=0;i<H.time.length;i++){
+    const stamp=H.time[i];
+    const instant=toInstant(stamp,offset);
+    if(instant<start || instant>end) continue;
+    const moon=SunCalc.getMoonPosition(instant,place.latitude,place.longitude);
+    const sun=SunCalc.getPosition(instant,place.latitude,place.longitude);
+    arr.push({
+      stamp,instant,
+      hour:stamp.slice(11,16),
+      temp:H.temperature_2m[i],
+      humidity:H.relative_humidity_2m[i],
+      dew:H.dew_point_2m[i],
+      precip:H.precipitation_probability?.[i] ?? 0,
+      maxPrecipMm:H.precipitation_max?.[i] ?? 0,
+      wetModels:H.wet_model_count?.[i] ?? 0,
+      modelCount:H.model_count?.[i] ?? 1,
+      confidence:H.confidence?.[i] ?? 50,
+      cloudMin:H.cloud_min?.[i] ?? H.cloud_cover[i],
+      cloudMax:H.cloud_max?.[i] ?? H.cloud_cover[i],
+      modelValues:weather.details?.[stamp]?.values || {},
+      cloud:H.cloud_cover[i],
+      low:H.cloud_cover_low?.[i] ?? 0,
+      mid:H.cloud_cover_mid?.[i] ?? 0,
+      high:H.cloud_cover_high?.[i] ?? 0,
+      visibility:H.visibility?.[i],
+      wind:H.wind_speed_10m[i],
+      gust:H.wind_gusts_10m?.[i] ?? H.wind_speed_10m[i],
+      moonAlt:rad2deg(moon.altitude),
+      sunAlt:rad2deg(sun.altitude)
+    });
+  }
+  return arr;
+}
+function bestContiguous(hours){
+  const viable=hours.filter(h=>h.metrics.total>=45 && h.sunAlt<=-12 && h.precip<40 && h.cloud<55);
+  if(!viable.length){
+    const top=[...hours].sort((a,b)=>b.metrics.total-a.metrics.total).slice(0,1);
+    return top.length?{items:top,label:`um ${top[0].hour}`}:{items:[],label:"kein brauchbares Fenster"};
+  }
+  let groups=[],g=[];
+  hours.forEach(h=>{
+    const ok=h.metrics.total>=45 && h.sunAlt<=-12 && h.precip<40 && h.cloud<55;
+    if(ok) g.push(h);
+    else if(g.length){groups.push(g);g=[]}
+  });
+  if(g.length) groups.push(g);
+  groups.sort((a,b)=>{
+    const av=x=>x.reduce((s,h)=>s+h.metrics.total,0)/x.length;
+    return (av(b)+Math.min(15,b.length*1.5))-(av(a)+Math.min(15,a.length*1.5));
+  });
+  const longEnough=groups.filter(x=>x.length>=2);
+  const best=(longEnough[0]||groups[0]||viable.slice(0,1));
+  const start=best[0].hour;
+  const endDate=new Date(best[best.length-1].instant.getTime()+3600000);
+  const end=localTime(endDate,weather.timezone);
+  return {items:best,label:`${start}–${end}`};
+}
+
+function wholeNightScore(hours,best){
+  // Die große Zahl soll die Nacht als Ganzes beschreiben, nicht nur die beste einzelne Stunde.
+  // Dafür betrachten wir die astronomisch/nautisch dunklen Stunden und mischen Mittelwert + Median.
+  const dark=hours.filter(h=>h.sunAlt<=-12);
+  const sample=dark.length?dark:hours;
+  if(!sample.length)return NaN;
+  const vals=sample.map(h=>h.metrics.total);
+  const nightBase=0.55*avg(vals)+0.45*median(vals);
+  const bestScore=best.items?.length?avg(best.items.map(h=>h.metrics.total)):Math.max(...vals);
+  const usable=sample.filter(h=>h.metrics.total>=45).length/sample.length;
+  // Ein wirklich gutes längeres Fenster darf helfen, aber niemals die restliche Nacht überdecken.
+  let total=0.78*nightBase+0.22*bestScore;
+  if(usable<0.25) total-=8;
+  else if(usable<0.50) total-=4;
+  return clamp(total);
+}
+
+function median(values){
+  const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
+  if(!a.length)return NaN;
+  const m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2;
+}
+function avg(values){const a=values.filter(Number.isFinite);return a.length?a.reduce((s,x)=>s+x,0)/a.length:NaN}
+
+function astronomicalTimes(){
+  const date=nightDate.value;
+  const noon=toInstant(date+"T12:00",weather.utc_offset_seconds||0);
+  const nextNoon=new Date(noon.getTime()+86400000);
+  const t1=SunCalc.getTimes(noon,place.latitude,place.longitude);
+  const t2=SunCalc.getTimes(nextNoon,place.latitude,place.longitude);
+  // dusk of selected date and dawn of following date
+  return {dusk:t1.night, dawn:t2.nightEnd};
+}
+function moonTimes(){
+  const date=nightDate.value;
+  const noon=toInstant(date+"T12:00",weather.utc_offset_seconds||0);
+  const t=SunCalc.getMoonTimes(noon,place.latitude,place.longitude,true);
+  return t;
+}
+function midnightInstant(){
+  return toInstant(datePlus(nightDate.value,1)+"T00:00",weather.utc_offset_seconds||0);
+}
+
+const TARGETS={
+  // Galaxien
+  M31:{name:"M31 · Andromedagalaxie",ra:10.6847,dec:41.2688,kind:"galaxy"},
+  M33:{name:"M33 · Dreiecksgalaxie",ra:23.4621,dec:30.6602,kind:"galaxy"},
+  M51:{name:"M51 · Whirlpool-Galaxie",ra:202.4696,dec:47.1952,kind:"galaxy"},
+  M63:{name:"M63 · Sonnenblumen-Galaxie",ra:198.9555,dec:42.0293,kind:"galaxy"},
+  M64:{name:"M64 · Black-Eye-Galaxie",ra:194.1821,dec:21.6827,kind:"galaxy"},
+  M65:{name:"M65 · Leo-Triplett",ra:169.7332,dec:13.0922,kind:"galaxy"},
+  M66:{name:"M66 · Leo-Triplett",ra:170.0624,dec:12.9913,kind:"galaxy"},
+  M81:{name:"M81 · Bodes Galaxie",ra:148.8882,dec:69.0653,kind:"galaxy"},
+  M82:{name:"M82 · Zigarrengalaxie",ra:148.9685,dec:69.6797,kind:"galaxy"},
+  M101:{name:"M101 · Feuerradgalaxie",ra:210.8023,dec:54.3490,kind:"galaxy"},
+  M104:{name:"M104 · Sombrerogalaxie",ra:189.9976,dec:-11.6231,kind:"galaxy"},
+  M106:{name:"M106 · Jagdhunde",ra:184.7396,dec:47.3040,kind:"galaxy"},
+  NGC253:{name:"NGC 253 · Sculptor-Galaxie",ra:11.8880,dec:-25.2880,kind:"galaxy"},
+
+  // Emissions-/planetarische Nebel und Supernovaüberreste
+  M1:{name:"M1 · Krebsnebel",ra:83.6331,dec:22.0145,kind:"emission"},
+  M8:{name:"M8 · Lagunennebel",ra:270.9250,dec:-24.3750,kind:"emission"},
+  M16:{name:"M16 · Adlernebel",ra:274.7000,dec:-13.8060,kind:"emission"},
+  M17:{name:"M17 · Omeganebel",ra:275.1960,dec:-16.1710,kind:"emission"},
+  M20:{name:"M20 · Trifidnebel",ra:270.5960,dec:-23.0300,kind:"emission"},
+  M27:{name:"M27 · Hantelnebel",ra:299.9013,dec:22.7211,kind:"emission"},
+  M42:{name:"M42 · Orionnebel",ra:83.8221,dec:-5.3911,kind:"emission"},
+  M57:{name:"M57 · Ringnebel",ra:283.3963,dec:33.0292,kind:"emission"},
+  M76:{name:"M76 · Kleiner Hantelnebel",ra:25.5820,dec:51.5750,kind:"emission"},
+  M97:{name:"M97 · Eulennebel",ra:168.6980,dec:55.0190,kind:"emission"},
+  NGC6960:{name:"NGC 6960 · Cirrusnebel West",ra:311.4000,dec:30.7200,kind:"emission"},
+  NGC6992:{name:"NGC 6992 · Cirrusnebel Ost",ra:312.7500,dec:31.7167,kind:"emission"},
+  NGC7000:{name:"NGC 7000 · Nordamerikanebel",ra:314.0000,dec:44.3330,kind:"emission"},
+  IC5070:{name:"IC 5070 · Pelikannebel",ra:312.7500,dec:44.4000,kind:"emission"},
+  NGC1499:{name:"NGC 1499 · Kaliforniennebel",ra:60.5000,dec:36.4500,kind:"emission"},
+  IC1805:{name:"IC 1805 · Herznebel",ra:38.2500,dec:61.4500,kind:"emission"},
+  IC1848:{name:"IC 1848 · Seelennebel",ra:43.0000,dec:60.4000,kind:"emission"},
+  NGC281:{name:"NGC 281 · Pacman-Nebel",ra:13.1700,dec:56.6200,kind:"emission"},
+  NGC2237:{name:"NGC 2237 · Rosettennebel",ra:97.9500,dec:4.9500,kind:"emission"},
+  IC434:{name:"IC 434 · Pferdekopfregion",ra:85.2500,dec:-2.4500,kind:"emission"},
+  NGC2024:{name:"NGC 2024 · Flammennebel",ra:85.4200,dec:-1.9000,kind:"emission"},
+  NGC2264:{name:"NGC 2264 · Konusnebel / Weihnachtsbaum",ra:100.2500,dec:9.8950,kind:"emission"},
+  NGC6888:{name:"NGC 6888 · Crescentnebel",ra:303.0300,dec:38.3500,kind:"emission"},
+  NGC7635:{name:"NGC 7635 · Blasennebel",ra:350.2000,dec:61.2000,kind:"emission"},
+  NGC7380:{name:"NGC 7380 · Wizard-Nebel",ra:342.2000,dec:58.1300,kind:"emission"},
+  NGC7822:{name:"NGC 7822 · Cepheus-Nebelregion",ra:0.7500,dec:67.3000,kind:"emission"},
+  IC1396:{name:"IC 1396 · Elefantenrüsselregion",ra:324.7500,dec:57.5000,kind:"emission"},
+  SH2101:{name:"Sh2-101 · Tulpennebel",ra:301.5000,dec:35.3000,kind:"emission"},
+
+  // Reflexionsnebel / helle Sternfelder
+  M45:{name:"M45 · Plejaden",ra:56.7500,dec:24.1167,kind:"reflection"},
+  M78:{name:"M78 · Reflexionsnebel",ra:86.6750,dec:0.0800,kind:"reflection"},
+  NGC7023:{name:"NGC 7023 · Irisnebel",ra:315.4000,dec:68.1700,kind:"reflection"},
+
+  // Kugelsternhaufen
+  M3:{name:"M3",ra:205.5484,dec:28.3773,kind:"cluster"},
+  M5:{name:"M5",ra:229.6384,dec:2.0810,kind:"cluster"},
+  M13:{name:"M13 · Herkuleshaufen",ra:250.4235,dec:36.4613,kind:"cluster"},
+  M15:{name:"M15",ra:322.4930,dec:12.1670,kind:"cluster"},
+  M92:{name:"M92",ra:259.2808,dec:43.1359,kind:"cluster"},
+
+  // Offene Sternhaufen
+  M11:{name:"M11 · Wildentenhaufen",ra:282.7667,dec:-6.2700,kind:"cluster"},
+  M35:{name:"M35",ra:92.2250,dec:24.3330,kind:"cluster"},
+  M36:{name:"M36",ra:84.0750,dec:34.1400,kind:"cluster"},
+  M37:{name:"M37",ra:88.0750,dec:32.5500,kind:"cluster"},
+  M38:{name:"M38",ra:82.1750,dec:35.8500,kind:"cluster"},
+  M44:{name:"M44 · Praesepe",ra:130.0250,dec:19.6670,kind:"cluster"},
+  M46:{name:"M46",ra:115.4500,dec:-14.8170,kind:"cluster"},
+  M47:{name:"M47",ra:114.1500,dec:-14.5000,kind:"cluster"},
+  M52:{name:"M52",ra:351.2000,dec:61.6000,kind:"cluster"},
+  M103:{name:"M103",ra:23.3000,dec:60.7000,kind:"cluster"},
+  DOUBLECLUSTER:{name:"NGC 869/884 · Doppelhaufen h/χ",ra:35.1900,dec:57.1500,kind:"cluster"}
+};
+function julianDate(d){return d.getTime()/86400000+2440587.5}
+function lstDeg(d,lon){
+  const jd=julianDate(d), T=(jd-2451545.0)/36525;
+  let gst=280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T-T*T*T/38710000;
+  return (gst+lon+360)%360;
+}
+function targetAltAz(d,lat,lon,ra,dec){
+  const H=((lstDeg(d,lon)-ra+540)%360)-180;
+  const hr=H*Math.PI/180, dr=dec*Math.PI/180, pr=lat*Math.PI/180;
+  const alt=Math.asin(Math.sin(dr)*Math.sin(pr)+Math.cos(dr)*Math.cos(pr)*Math.cos(hr));
+  const az=Math.atan2(-Math.sin(hr),Math.tan(dr)*Math.cos(pr)-Math.sin(pr)*Math.cos(hr));
+  return {alt:rad2deg(alt),az:(rad2deg(az)+360)%360};
+}
+function angSep(ra1,dec1,ra2,dec2){
+  const r=Math.PI/180;
+  const c=Math.sin(dec1*r)*Math.sin(dec2*r)+Math.cos(dec1*r)*Math.cos(dec2*r)*Math.cos((ra1-ra2)*r);
+  return rad2deg(Math.acos(Math.max(-1,Math.min(1,c))));
+}
+function moonRaDec(d){
+  const e=SunCalc.getMoonPosition(d,place.latitude,place.longitude);
+  const ra=SunCalc.getMoonIllumination?null:null;
+  // derive approximate equatorial coordinates from horizontal position and local sidereal time
+  const alt=e.altitude, az=e.azimuth+Math.PI;
+  const lat=place.latitude*Math.PI/180;
+  const dec=Math.asin(Math.sin(alt)*Math.sin(lat)+Math.cos(alt)*Math.cos(lat)*Math.cos(az));
+  const H=Math.atan2(-Math.sin(az)*Math.cos(alt),Math.sin(alt)*Math.cos(lat)-Math.cos(alt)*Math.sin(lat)*Math.cos(az));
+  const raDeg=(lstDeg(d,place.longitude)-rad2deg(H)+360)%360;
+  return {ra:raDeg,dec:rad2deg(dec)};
+}
+function targetAltitudeScore(alt){
+  if(alt<=0) return 0;
+  if(alt<20) return alt/20*20;
+  if(alt<30) return 20+(alt-20)*2.5;
+  if(alt<45) return 45+(alt-30)*2.4;
+  return Math.min(100,81+(alt-45)*0.55);
+}
+function targetMoonScore(sep,illum,moonAlt,mode,filterKey="broadband"){
+  if(moonAlt<=0 || mode==="planets") return 100;
+  if(mode==="moon") return 100;
+  const profile=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
+  const brightness=illum*Math.max(.35,Math.sin(Math.max(0,moonAlt)*Math.PI/180));
+  let separation=sep>=120?100:sep>=90?82:sep>=60?62:sep>=40?42:sep>=20?22:8;
+  let score=100-brightness*(100-separation)*profile.moonFactor;
+  if(mode==="milky") score-=brightness*20*profile.moonFactor;
+  return clamp(score);
+}
+function filterTargetCompatibility(filterKey,kind){
+  if(filterKey==="broadband") return 100;
+  if(filterKey==="lp") return kind==="emission"?95:92;
+  if(kind==="emission"){
+    if(filterKey==="dual") return 100;
+    if(filterKey==="ha") return 88;
+    if(filterKey==="oiii") return 82;
+    if(filterKey==="sii") return 76;
+  }
+  if(kind==="galaxy") return filterKey==="dual"?35:20;
+  if(kind==="reflection") return filterKey==="dual"?20:12;
+  if(kind==="cluster"){
+    if(filterKey==="lp") return 92;
+    return filterKey==="dual"?22:12;
+  }
+  return 70;
+}
+function compatibilityText(v){return v>=90?"passt sehr gut":v>=70?"gut nutzbar":v>=45?"nur bedingt passend":"für dieses Ziel ungeeignet"}
+function targetVerdictText(score){
+  return score>=80?"Sehr gutes Zielfenster":score>=65?"Gutes Zielfenster":score>=50?"Nur eingeschränkt sinnvoll":score>=30?"Schwaches Zielfenster":"Für dieses Ziel ungünstig";
+}
+function diagnosisForNight(all,mode,illum,totalScore,best,filterKey="broadband"){
+  const dark=all.filter(h=>h.sunAlt<=-12); const sample=dark.length?dark:all;
+  const cloud=avg(sample.map(h=>h.cloud)), precip=Math.max(0,...sample.map(h=>h.precip||0));
+  const conf=avg(sample.map(h=>h.confidence));
+  const moonUp=sample.filter(h=>h.moonAlt>0); const moonHours=moonUp.length;
+  const usable=sample.filter(h=>h.metrics.total>=45).length;
+  const items=[];
+  const push=(cls,text)=>items.push(`<span class="diagChip ${cls}">${text}</span>`);
+  if(cloud>=60) push("bad",`☁ Viel Bewölkung · Ø ${Math.round(cloud)} %`);
+  else if(cloud>=30) push("ok",`☁ Wechselhaft · Ø ${Math.round(cloud)} %`);
+  else push("good",`☁ Wenig Wolken · Ø ${Math.round(cloud)} %`);
+  const fp=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
+  if((mode==="deep"||mode==="milky") && illum>=.8 && moonHours){
+    if(fp.moonFactor<=.35) push("ok",`☾ ${Math.round(illum*100)} % Mond · durch ${fp.label} stark gedämpft`);
+    else if(fp.moonFactor<.75) push("ok",`☾ Heller Mond · ${fp.label} reduziert den Einfluss`);
+    else push("bad",`☾ Sehr heller Mond · ${Math.round(illum*100)} % · ${moonHours} h über Horizont`);
+  } else if((mode==="deep"||mode==="milky") && illum>=.5 && moonHours){
+    if(fp.moonFactor<.75) push("good",`☾ Mondeinfluss durch ${fp.label} reduziert`);
+    else push("ok",`☾ Deutlicher Mondeinfluss · ${Math.round(illum*100)} %`);
+  } else if(mode==="deep"||mode==="milky") push("good","☾ Mondeinfluss gering");
+  if((mode==="deep"||mode==="milky") && filterKey!=="broadband") push("good",`◉ Filter: ${fp.label}`);
+  if(precip>=40) push("bad",`☂ Regenrisiko bis ${Math.round(precip)} %`);
+  else if(precip>=15) push("ok",`☂ Etwas Regenrisiko · bis ${Math.round(precip)} %`);
+  if(conf<50) push("bad",`≋ Modelle uneinig · Sicherheit ${Math.round(conf)}`);
+  else if(conf<75) push("ok",`≋ Mittlere Sicherheit · ${Math.round(conf)}`);
+  else push("good",`≋ Modelle recht einig · ${Math.round(conf)}`);
+  if(usable<=1) push("bad",`⌛ Kaum brauchbare Zeit · ${usable} h`);
+  else if(usable<=3) push("ok",`⌛ Kurzes nutzbares Fenster · ${usable} h`);
+  else push("good",`⌛ ${usable} brauchbare Stunden`);
+  return items.join("");
+}
+function renderNightStrip(all,best){
+  const el=$("nightStrip"); el.innerHTML="";
+  const labelCol=194, hourCol=100;
+  el.style.gridTemplateColumns=`${labelCol}px repeat(${all.length}, ${hourCol}px)`;
+  el.style.width=`${labelCol + all.length*hourCol}px`;
+  const table=$("timelineTable");
+  const canvas=$("timelineCanvas");
+  const totalWidth=labelCol + all.length*hourCol;
+  table.style.width=`${totalWidth}px`;
+  if(canvas) canvas.style.width=`${totalWidth}px`;
+  const label=document.createElement("div");
+  label.className="stripLabel";
+  label.textContent="Stunden-Score";
+  el.appendChild(label);
+  const bestStamps=new Set((best.items||[]).map(h=>h.stamp));
+  all.forEach(h=>{
+    const block=document.createElement("div");
+    const score=Math.round(h.metrics.total), cls=colorClass(score);
+    block.className=`hourBlock ${cls}${bestStamps.has(h.stamp)?" best":""}`;
+    block.title=`${h.hour} · Score ${score} · Wolken ${Math.round(h.cloud)} % (${Math.round(h.cloudMin)}–${Math.round(h.cloudMax)} %) · Niederschlag ${Math.round(h.precip)} % · Mond ${h.moonAlt>0?Math.round(h.moonAlt)+"°":"unten"}`;
+    block.innerHTML=`<div class="hourTime">${h.hour}</div><div class="hourScore">${score}</div><div class="hourMeta">☁ ${Math.round(h.cloud)}%</div>`;
+    el.appendChild(block);
+  });
+  currentNightHours=all;
+  renderNowMarker(all);
+}
+
+function renderNowMarker(all){
+  const marker=$("nowMarker"), label=$("nowMarkerLabel"), canvas=$("timelineCanvas");
+  if(!marker || !label || !canvas || !weather || !all?.length){if(marker) marker.style.display="none";return}
+  const now=new Date();
+  const hourMs=3600000;
+  // Hour labels represent the centre of each 100 px column. The visible
+  // range therefore starts/ends half an hour around the first/last stamp.
+  const start=new Date(all[0].instant.getTime()-hourMs/2);
+  const end=new Date(all[all.length-1].instant.getTime()+hourMs/2);
+  if(now<start || now>end){marker.style.display="none";return}
+  const labelCol=194, hourCol=100;
+  const hoursFromStart=(now-start)/hourMs;
+  const x=labelCol + hoursFromStart*hourCol;
+  marker.style.left=`${x}px`;
+  marker.style.display="block";
+  label.textContent=`Jetzt ${localTime(now,weather.timezone)}`;
+  marker.title=`Aktuelle Zeit: ${localTime(now,weather.timezone)}`;
+}
+
+function renderTarget(all){
+  const key=targetEl.value, card=$("targetCard");
+  if(key==="none"||!TARGETS[key]){card.style.display="none";return}
+  card.style.display="block";
+  const t=TARGETS[key]; $("targetName").textContent=t.name;
+  const illum=SunCalc.getMoonIllumination(midnightInstant()).fraction;
+  const mode=modeEl.value;
+  const filterKey=filterEl.value;
+  const profile=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
+  const compatibility=filterTargetCompatibility(filterKey,t.kind);
+  const rows=all.map(h=>{
+    const aa=targetAltAz(h.instant,place.latitude,place.longitude,t.ra,t.dec);
+    const moon=moonRaDec(h.instant);
+    const sep=angSep(t.ra,t.dec,moon.ra,moon.dec);
+    const altitudeFactor=targetAltitudeScore(aa.alt);
+    const moonFactor=targetMoonScore(sep,illum,h.moonAlt,mode,filterKey);
+    let combo=h.metrics.total*.60+altitudeFactor*.23+moonFactor*.12+compatibility*.05;
+    // Ein Ziel-Score darf schlechte Grundbedingungen nicht wegrechnen.
+    combo=Math.min(combo,h.metrics.total+16);
+    if(aa.alt<20) combo=Math.min(combo,22);
+    else if(aa.alt<30) combo=Math.min(combo,48);
+    if((mode==="deep"||mode==="milky") && illum>=.8 && h.moonAlt>0){
+      const base=sep<30?15:sep<60?25:sep<90?35:48;
+      combo=Math.min(combo,relaxedMoonCap(base,profile,profile.targetMax));
+    }
+    // Narrowband hilft nur bei Linienemission. Für Galaxien und Reflexionsnebel
+    // wird ein unpassender Filter deshalb als eigener harter Ziel-Limit berücksichtigt.
+    combo=Math.min(combo,compatibility);
+    return {...h,targetAlt:aa.alt,moonSep:sep,targetAltitudeFactor:altitudeFactor,targetMoonFactor:moonFactor,targetScore:clamp(combo)};
+  });
+  const visible=rows.filter(h=>h.targetAlt>=20&&h.sunAlt<=-12&&h.metrics.total>=35);
+  const best=[...visible].sort((a,b)=>b.targetScore-a.targetScore)[0]||[...rows].sort((a,b)=>b.targetScore-a.targetScore)[0];
+  const max=[...rows].sort((a,b)=>b.targetAlt-a.targetAlt)[0];
+  const above30=rows.filter(h=>h.targetAlt>=30&&h.sunAlt<=-6).length;
+  $("targetMaxAlt").textContent=max?`${Math.round(max.targetAlt)}°`:"–";
+  $("targetTransit").textContent=max?max.hour:"–";
+  $("targetMoonSep").textContent=best?`${Math.round(best.moonSep)}°`:"–";
+  $("targetAbove30").textContent=above30?`${above30} h`:"0 h";
+  if(visible.length){
+    let groups=[],g=[];
+    rows.forEach(h=>{const ok=h.targetAlt>=25&&h.sunAlt<=-12&&h.metrics.total>=35&&h.targetScore>=40;if(ok)g.push(h);else if(g.length){groups.push(g);g=[]}});if(g.length)groups.push(g);
+    groups.sort((a,b)=>avg(b.map(x=>x.targetScore))-avg(a.map(x=>x.targetScore)));
+    const bg=groups[0]||visible.slice(0,1);
+    const end=localTime(new Date(bg[bg.length-1].instant.getTime()+3600000),weather.timezone);
+    $("targetWindow").textContent=`${bg[0].hour}–${end}`;
+  } else $("targetWindow").textContent="kein brauchbares Fenster";
+  const score=best?Math.round(best.targetScore):NaN;
+  $("targetScore").textContent=Number.isFinite(score)?score:"–";
+  $("targetVerdict").textContent=Number.isFinite(score)?targetVerdictText(score):"Keine Zielbewertung möglich";
+  if(best){
+    let reasons=[];
+    if(best.targetAlt<30) reasons.push(`Ziel steht nur ${Math.round(best.targetAlt)}° hoch`); else if(best.targetAlt>=50) reasons.push(`gute Zielhöhe ${Math.round(best.targetAlt)}°`);
+    if((mode==="deep"||mode==="milky")&&illum>=.8&&best.moonAlt>0){
+      if(profile.moonFactor<=.35) reasons.push(`heller Mond, durch ${profile.label} deutlich gedämpft`);
+      else reasons.push(`sehr heller Mond (${Math.round(illum*100)} %) mit ${Math.round(best.moonSep)}° Abstand`);
+    }
+    if(filterKey!=="broadband") reasons.push(`${profile.label}: ${compatibilityText(compatibility)} für ${t.name.split(" · ")[0]}`);
+    if(best.metrics.total<45) reasons.push(`Wetter limitiert mit Score ${Math.round(best.metrics.total)}`); else reasons.push(`Wetter-Score ${Math.round(best.metrics.total)}`);
+    $("targetWhy").textContent=reasons.join(" · ");
+    $("targetSummary").textContent=`Beste Kombination derzeit ${best.hour}: Zielhöhe ${Math.round(best.targetAlt)}°, Mondabstand ${Math.round(best.moonSep)}°, Wetter ${Math.round(best.metrics.total)}, Ziel-Score ${score}. Der Ziel-Score ist bewusst konservativ und berücksichtigt zusätzlich, ob der gewählte Filter zum Objekttyp passt.`;
+  } else {
+    $("targetWhy").textContent="Keine brauchbare Kombination aus Höhe, Dunkelheit und Wetter.";
+    $("targetSummary").textContent="Keine Zielfenster berechenbar.";
+  }
+}
+
+
+function renderModelComparison(focus){
+  const stamps=new Set(focus.map(h=>h.stamp));
+  for(const cfg of MODEL_CONFIGS){
+    const m=modelWeather.find(x=>x.key===cfg.key);
+    const state=$("modelState_"+cfg.key), cloudEl=$("modelCloud_"+cfg.key), rainEl=$("modelRain_"+cfg.key);
+    if(!m?.available){state.textContent="nicht verfügbar";state.className="modelState bad";cloudEl.textContent="–";rainEl.textContent="–";continue}
+    const idx=[...stamps].map(st=>m.index.get(st)).filter(i=>i!=null);
+    const clouds=idx.map(i=>finite(m.data.hourly.cloud_cover?.[i])).filter(Number.isFinite);
+    const rains=idx.map(i=>finite(m.data.hourly.precipitation?.[i])).filter(Number.isFinite);
+    state.textContent=m.fallback?"Fallback":"aktiv";state.className="modelState good";
+    cloudEl.textContent=clouds.length?`${Math.round(avg(clouds))} %`:"–";
+    rainEl.textContent=rains.length?`${Math.max(...rains).toFixed(1)} mm`:"–";
+  }
+  const conf=Math.round(avg(focus.map(h=>h.confidence)));
+  const minCloud=Math.round(avg(focus.map(h=>h.cloudMin))), maxCloud=Math.round(avg(focus.map(h=>h.cloudMax)));
+  const badge=$("modelConfidenceBadge");badge.textContent=`Prognosesicherheit: ${confidenceName(conf)}`;badge.className=`confidencePill ${confidenceClass(conf)}`;
+  $("consensusScore").textContent=isFinite(conf)?conf:"–";
+  const active=modelWeather.filter(m=>m.available).length;
+  const wetMax=Math.max(0,...focus.map(h=>h.wetModels||0));
+  let msg=conf>=75?"Die Modelle liegen eng beieinander.":conf>=50?"Die Modelle weichen merklich voneinander ab.":"Die Modelle widersprechen sich deutlich – die Nacht ist schwer vorherzusagen.";
+  $("consensusText").innerHTML=`<b>${msg}</b><br>Im besten Fenster reicht die mittlere Wolkenspanne ungefähr von ${minCloud} bis ${maxCloud} %. ${wetMax?`Bis zu ${wetMax} von ${active} Modellen zeigen Niederschlag.`:"Keines der aktiven Modelle zeigt im besten Fenster nennenswerten Niederschlag."}`;
+}
+
+function render(){
+  if(!weather || !place || typeof SunCalc==="undefined"){
+    if(typeof SunCalc==="undefined") setStatus("SunCalc konnte nicht geladen werden. Internetverbindung prüfen.",true);
+    return;
+  }
+  const mode=modeEl.value;
+  const filterKey=filterEl.value;
+  const all=buildNightHours();
+  if(!all.length){setStatus("Für dieses Datum liegen keine Daten im 7-Tage-Fenster vor.",true);return}
+  const illum=SunCalc.getMoonIllumination(midnightInstant());
+  all.forEach(h=>h.metrics=scoreHour(h,mode,illum.fraction,filterKey));
+  const best=bestContiguous(all);
+  const focus=best.items.length?best.items:[...all].sort((a,b)=>b.metrics.total-a.metrics.total).slice(0,1);
+  const bestScore=Math.round(avg(focus.map(h=>h.metrics.total)));
+  const totalScore=Math.round(wholeNightScore(all,best));
+
+  $("scoreNum").textContent=isFinite(totalScore)?totalScore:"–";
+  $("scoreRing").style.setProperty("--score",isFinite(totalScore)?totalScore:0);
+  $("scoreRing").style.background=`conic-gradient(var(--${colorClass(totalScore)}) ${totalScore}%,#202b3b 0)`;
+
+  const labels={deep:"Deep Sky",milky:"Milchstraße",moon:"Mond",planets:"Planeten"};
+  const filterLabel=(mode==="deep"||mode==="milky")?` · ${FILTER_PROFILES[filterKey].label}`:"";
+  let verdict= totalScore>=80 ? `Sehr gute Nacht für ${labels[mode]}${filterLabel}` :
+               totalScore>=65 ? `Gute Bedingungen für ${labels[mode]}${filterLabel}` :
+               totalScore>=45 ? `Nur eingeschränkt brauchbar für ${labels[mode]}${filterLabel}` :
+               `Ungünstig für ${labels[mode]}${filterLabel}`;
+  $("verdict").textContent=verdict;
+  $("bestWindow").textContent=`● Bestes Fenster: ${best.label} · Score ${bestScore}`;
+  $("bestWindow").className="pill "+colorClass(bestScore);
+  const confScore=Math.round(avg(focus.map(h=>h.confidence)));
+  $("forecastConfidence").textContent=`◆ Sicherheit: ${confidenceName(confScore)} (${confScore})`;
+  $("forecastConfidence").className=`confidencePill ${confidenceClass(confScore)}`;
+
+  const cloud=Math.round(avg(focus.map(h=>h.cloud)));
+  const wind=Math.round(avg(focus.map(h=>h.wind)));
+  const hum=Math.round(avg(focus.map(h=>h.humidity)));
+  const temp=avg(focus.map(h=>h.temp)), dew=avg(focus.map(h=>h.dew));
+  const cloudMin=Math.round(avg(focus.map(h=>h.cloudMin))), cloudMax=Math.round(avg(focus.map(h=>h.cloudMax)));
+  $("mCloud").textContent=`${cloud} %`;
+  $("mCloud").title=`Modelle etwa ${cloudMin}–${cloudMax} %`;
+  $("mWind").textContent=`${wind} km/h`;
+  $("mHum").textContent=`${hum} %`;
+  $("mDew").textContent=`${temp.toFixed(1)} / ${dew.toFixed(1)} °C`;
+  const wetMax=Math.max(0,...focus.map(h=>h.wetModels||0));
+  const modelMax=Math.max(1,...focus.map(h=>h.modelCount||1));
+  $("mPrecip").textContent=`${Math.round(avg(focus.map(h=>h.precip)))} %`;
+  $("mPrecip").title=`Bis zu ${wetMax}/${modelMax} Modelle mit ≥0,1 mm/h`;
+
+  const weakest=[
+    ["Wolken",avg(focus.map(h=>h.metrics.cloud))],
+    ["Mondlicht",avg(focus.map(h=>h.metrics.moon))],
+    ["Wind",avg(focus.map(h=>h.metrics.wind))],
+    ["Tau-Risiko",avg(focus.map(h=>h.metrics.dew))],
+    ["Dunkelheit",avg(focus.map(h=>h.metrics.dark))],
+    ["Niederschlag",avg(focus.map(h=>h.metrics.precip))],
+    ["Modelluneinigkeit",avg(focus.map(h=>h.metrics.consensus))]
+  ].sort((a,b)=>a[1]-b[1])[0];
+  const strongest=[
+    ["wenig Wolken",avg(focus.map(h=>h.metrics.cloud))],
+    ["ruhiger Wind",avg(focus.map(h=>h.metrics.wind))],
+    ["geringer Mondeinfluss",avg(focus.map(h=>h.metrics.moon))]
+  ].sort((a,b)=>b[1]-a[1])[0];
+  $("explain").textContent=`Stärkster Pluspunkt: ${strongest[0]}. Größte Einschränkung: ${weakest[0]}. Der Nacht-Score bewertet die gesamte dunkle Nacht; das beste Zeitfenster wird separat angezeigt.`;
+  $("diagnosis").innerHTML=diagnosisForNight(all,mode,illum.fraction,totalScore,best,filterKey);
+  renderNightStrip(all,best);
+
+  // Moon
+  const pct=Math.round(illum.fraction*100);
+  $("moonPct").textContent=`${pct} %`;
+  $("moonPhase").textContent=phaseName(illum.phase);
+  const phase=illum.phase;
+  renderMoonDisk(phase);
+  const mt=moonTimes();
+  $("moonRise").textContent=mt.rise?localTime(mt.rise,weather.timezone):(mt.alwaysUp?"ganztägig oben":"–");
+  $("moonSet").textContent=mt.set?localTime(mt.set,weather.timezone):(mt.alwaysDown?"ganztägig unten":"–");
+  const mAlt=rad2deg(SunCalc.getMoonPosition(midnightInstant(),place.latitude,place.longitude).altitude);
+  $("moonAlt").textContent=`${Math.round(mAlt)}°`;
+  const moonFactor=Math.round(avg(focus.map(h=>h.metrics.moon)));
+  $("moonImpact").textContent=quality(moonFactor);
+
+  const times=astronomicalTimes();
+  $("astroNight").textContent=(times.dusk&&times.dawn)?`${localTime(times.dusk,weather.timezone)}–${localTime(times.dawn,weather.timezone)}`:"keine / nicht berechenbar";
+
+  // Header
+  const firstInstant=toInstant(nightDate.value+"T18:00",weather.utc_offset_seconds||0);
+  const nextInstant=toInstant(datePlus(nightDate.value,1)+"T06:00",weather.utc_offset_seconds||0);
+  $("headlineLocation").textContent=`${fmtPlace(place)} · ${localWeekday(firstInstant,weather.timezone)} → ${localWeekday(nextInstant,weather.timezone)}`;
+
+  // Timeline
+  ["timeHead","cloudRow","spreadRow","layersRow","windRow","precipRow","humidityRow","moonRow","darkRow","confidenceRow","scoreRow"].forEach(id=>{
+    const row=$(id); while(row.children.length>1) row.removeChild(row.lastChild);
+  });
+  all.forEach(h=>{
+    const add=(row,txt,cls="")=>{const el=document.createElement(row==="timeHead"?"th":"td");el.textContent=txt;if(cls)el.className=cls;$(row).appendChild(el)};
+    add("timeHead",h.hour);
+    add("cloudRow",Math.round(h.cloud));
+    add("spreadRow",`${Math.round(h.cloudMin)}–${Math.round(h.cloudMax)}`,h.cloudMax-h.cloudMin>45?"bad":h.cloudMax-h.cloudMin>20?"ok":"good");
+    add("layersRow",`${Math.round(h.high)}/${Math.round(h.mid)}/${Math.round(h.low)}`);
+    add("windRow",Math.round(h.wind));
+    add("precipRow",Math.round(h.precip),h.precip>=50?"bad":h.precip>=20?"ok":"good");
+    add("humidityRow",Math.round(h.humidity));
+    add("moonRow",h.moonAlt>0?`${Math.round(h.moonAlt)}°`:"–");
+    add("darkRow",darknessName(h.sunAlt));
+    add("confidenceRow",`${confidenceName(h.confidence)} ${Math.round(h.confidence)}`,confidenceClass(h.confidence));
+    const td=document.createElement("td"), d=document.createElement("i");
+    d.className=`dot ${colorClass(h.metrics.total)}`;
+    d.style.background=`var(--${colorClass(h.metrics.total)})`;
+    d.title=`Score ${Math.round(h.metrics.total)}`;
+    td.appendChild(d); $("scoreRow").appendChild(td);
+  });
+
+  const factorMap={
+    Cloud:["fCloud","bCloud","cloud"],Moon:["fMoon","bMoon","moon"],Wind:["fWind","bWind","wind"],
+    Dew:["fDew","bDew","dew"],Dark:["fDark","bDark","dark"],Vis:["fVis","bVis","vis"],Precip:["fPrecip","bPrecip","precip"],Consensus:["fConsensus","bConsensus","consensus"]
+  };
+  const factorHours=all.filter(h=>h.sunAlt<=-12);
+  const factorSample=factorHours.length?factorHours:all;
+  Object.values(factorMap).forEach(([label,bar,key])=>{
+    const val=Math.round(avg(factorSample.map(h=>h.metrics[key])));
+    $(label).textContent=quality(val);
+    $(bar).style.width=`${val}%`;
+  });
+  renderModelComparison(focus);
+  renderTarget(all);
+}
+
+locationInput.addEventListener("input",e=>{
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>searchPlaces(e.target.value),260);
+});
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".field")) resultsEl.classList.remove("open");
+});
+function syncFilterState(){
+  const relevant=modeEl.value==="deep"||modeEl.value==="milky";
+  filterEl.disabled=!relevant;
+  filterEl.title=relevant?"Der Filter verändert den Mondeinfluss und bei gewähltem Ziel zusätzlich die spektrale Eignung. Wolken und Regen bleiben unverändert.":"Im Mond- und Planetenmodus wird der Aufnahmefilter nicht bewertet.";
+}
+modeEl.addEventListener("change",()=>{syncFilterState();weather&&render()});
+targetEl.addEventListener("change",()=>{localStorage.setItem("astroNightTarget",targetEl.value);weather&&render()});
+filterEl.addEventListener("change",()=>{localStorage.setItem("astroNightFilter",filterEl.value);weather&&render()});
+nightDate.addEventListener("change",()=>weather&&render());
+try{const savedFilter=localStorage.getItem("astroNightFilter");if(savedFilter&&FILTER_PROFILES[savedFilter]) filterEl.value=savedFilter}catch(_){}
+try{const savedTarget=localStorage.getItem("astroNightTarget");if(savedTarget&&TARGETS[savedTarget]) targetEl.value=savedTarget}catch(_){}
+syncFilterState();
+
+// Move the current-time marker without reloading weather data.
+setInterval(()=>{if(currentNightHours.length) renderNowMarker(currentNightHours)},30000);
+
+$("locateBtn").addEventListener("click",()=>{
+  if(!navigator.geolocation){setStatus("Geolocation wird von diesem Browser nicht unterstützt.",true);return}
+  setStatus("Standortfreigabe wird angefragt …");
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    place=await reversePlace(pos.coords.latitude,pos.coords.longitude);
+    locationInput.value="Mein Standort";
+    localStorage.setItem("astroNightPlace",JSON.stringify(place));
+    loadWeather();
+  },err=>{
+    setStatus("Standort konnte nicht gelesen werden. Du kannst stattdessen einen Ort suchen.",true);
+  },{enableHighAccuracy:false,timeout:8000,maximumAge:600000});
+});
+
+// Restore last location. If none, keep the app neutral rather than guessing.
+try{
+  const saved=JSON.parse(localStorage.getItem("astroNightPlace"));
+  if(saved && isFinite(saved.latitude) && isFinite(saved.longitude)){
+    place=saved; locationInput.value=fmtPlace(saved); loadWeather();
+  }
+}catch(_){}
+})();
+</script>
+</body>
+</html>
