@@ -60,6 +60,13 @@ h1{font-size:clamp(28px,4vw,42px);line-height:1;margin:6px 0 8px;letter-spacing:
 .result small{display:block;color:var(--muted);margin-top:2px}
 .status{min-height:21px;color:var(--muted);font-size:12px;margin-top:10px}
 .status.err{color:var(--bad)}
+
+/* Precise observing location */
+.locationBar{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+.locationCurrent{min-width:240px;display:grid;gap:2px}.locationKicker{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:750}.locationCurrent b{font-size:13px;font-variant-numeric:tabular-nums}.locationCurrent small{color:var(--muted);font-size:10px}
+.locationControls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.locationControls .select{width:auto;min-width:210px;height:36px}.btn.compact{height:36px;padding:0 11px;font-size:12px}.btn:disabled{opacity:.42;cursor:not-allowed}
+.coordEditor{display:none;margin-top:11px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#0b121d}.coordEditor.open{display:block}.coordGrid{display:grid;grid-template-columns:1.25fr .8fr .8fr;gap:9px}.coordField{display:grid;gap:5px}.coordField span{font-size:10px;color:var(--muted)}.coordField .input{height:39px;font-variant-numeric:tabular-nums}.coordActions{display:flex;justify-content:flex-end;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.coordHelp{margin-right:auto;color:var(--muted);font-size:10px;max-width:470px}
+@media(max-width:760px){.locationBar{align-items:stretch}.locationControls{width:100%}.locationControls .select{flex:1;min-width:180px}.coordGrid{grid-template-columns:1fr}.coordActions{justify-content:stretch}.coordActions .btn{flex:1}.coordHelp{width:100%;margin-right:0}}
 .grid{display:grid;grid-template-columns:1.35fr .65fr;gap:16px}
 .card{padding:18px}
 .hero{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
@@ -132,7 +139,9 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
 .confidencePill.good{color:var(--good);background:#10231a;border-color:#1f4930}
 .confidencePill.ok{color:var(--ok);background:#272111;border-color:#4a3d17}
 .confidencePill.bad{color:var(--bad);background:#2b171a;border-color:#54262c}
-.modelGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.modelGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:14px}
+.modelHeadBadges{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.regionPill{display:inline-flex;align-items:center;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:700;border:1px solid var(--line);background:#101824;color:var(--accent)}
 .modelCard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px}
 .modelTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .modelName{font-weight:760}.modelMeta{font-size:10px;color:var(--muted);margin-top:2px}.modelState{font-size:11px;color:var(--muted)}
@@ -145,7 +154,7 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
 @media(max-width:850px){.modelGrid{grid-template-columns:1fr}.consensusBox{grid-template-columns:1fr}.consensusScore{text-align:left}}
 
 .targetGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:14px}
-.targetStats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.targetStats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .targetStat{padding:11px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
 .targetStat span{font-size:11px;color:var(--muted);display:block}.targetStat b{display:block;font-size:17px;margin-top:2px}
 .targetSummary{color:var(--muted);font-size:13px;line-height:1.5}
@@ -193,13 +202,29 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
 .targetVerdict{font-size:18px;font-weight:780}.targetWhy{font-size:12px;color:var(--muted);margin-top:4px}
 @media(max-width:610px){.targetLead{grid-template-columns:1fr}.targetScoreBadge{width:100%;height:auto;padding:12px;display:flex;gap:9px;align-items:baseline;justify-content:center}.targetScoreBadge span{display:inline}}
 
+/* Directional light pollution */
+.lpGrid{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:center;margin-top:14px}
+.lpCompassWrap{display:grid;place-items:center;min-height:260px}
+.lpCompass{width:260px;height:260px;max-width:100%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#0b121d 0 48%,#0d1623 49% 100%);border:1px solid var(--line)}
+.lpInfo{display:grid;gap:11px}
+.lpStats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.lpStat{padding:11px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+.lpStat span{display:block;font-size:11px;color:var(--muted)}.lpStat b{display:block;font-size:17px;margin-top:2px}
+.lpSummary{padding:12px;border:1px solid var(--line);background:#0b121d;border-radius:12px;color:var(--muted);font-size:12px;line-height:1.55}
+.lpSummary b{color:var(--text)}
+.lpStatus{font-size:11px;color:var(--muted)}
+.lpStatus.good{color:var(--good)}.lpStatus.ok{color:var(--ok)}.lpStatus.bad{color:var(--bad)}
+.lpSourceLink{font-size:10px;color:var(--muted);margin-top:7px}
+@media(max-width:760px){.lpGrid{grid-template-columns:1fr}.lpCompassWrap{min-height:220px}.lpCompass{width:230px;height:230px}.lpStats{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.lpStats{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <div class="top">
     <div>
-      <div class="eyebrow">AstroNight · Time Preview</div>
+      <div class="eyebrow">AstroNight · Precise Location Preview</div>
       <h1>Heute Nacht</h1>
       <div class="sub" id="headlineLocation">Standort wählen, um die Nacht zu berechnen.</div>
     </div>
@@ -302,7 +327,34 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
       <input class="input" type="date" id="nightDate" aria-label="Datum">
       <button class="btn primary" id="locateBtn">⌖ Mein Standort</button>
     </div>
-    <div class="status" id="status">Tipp: Ort eintippen und aus der Trefferliste auswählen.</div>
+    <div class="locationBar">
+      <div class="locationCurrent">
+        <span class="locationKicker">Berechnungsposition</span>
+        <b id="coordDisplay">Noch keine Position gewählt</b>
+        <small id="coordSource">Ortssuche, Geräteposition oder Koordinaten verwenden.</small>
+      </div>
+      <div class="locationControls">
+        <select class="select" id="savedSiteSelect" aria-label="Gespeicherten Beobachtungsplatz laden">
+          <option value="">Beobachtungsplatz laden …</option>
+        </select>
+        <button class="btn compact" id="editCoordsBtn" type="button">⌖ Koordinaten</button>
+        <button class="btn compact" id="deleteSiteBtn" type="button" disabled>Entfernen</button>
+      </div>
+    </div>
+    <div class="coordEditor" id="coordEditor">
+      <div class="coordGrid">
+        <label class="coordField"><span>Bezeichnung</span><input class="input" id="siteNameInput" autocomplete="off" placeholder="z. B. Beobachtungsplatz West"></label>
+        <label class="coordField"><span>Breitengrad</span><input class="input" id="latInput" type="number" min="-90" max="90" step="0.000001" inputmode="decimal" placeholder="48.000000"></label>
+        <label class="coordField"><span>Längengrad</span><input class="input" id="lonInput" type="number" min="-180" max="180" step="0.000001" inputmode="decimal" placeholder="16.000000"></label>
+      </div>
+      <div class="coordActions">
+        <span class="coordHelp">Für Wetter, Sonne/Mond, Zielazimut und Lichtverschmutzung werden immer diese Koordinaten verwendet. Der Ortsname ist nur eine Beschriftung.</span>
+        <button class="btn compact" id="closeCoordsBtn" type="button">Schließen</button>
+        <button class="btn compact" id="applyCoordsBtn" type="button">Übernehmen</button>
+        <button class="btn compact primary" id="saveCoordsBtn" type="button">☆ Als Favorit speichern</button>
+      </div>
+    </div>
+    <div class="status" id="status">Tipp: Für die genaueste Lichtglocken-Analyse Geräteposition oder exakte Koordinaten verwenden.</div>
   </div>
 
   <main class="grid" id="dashboard">
@@ -347,24 +399,31 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
     <section class="panel card wide">
       <div class="cardHead">
         <div><div class="eyebrow">Prognosesicherheit</div><div class="cardTitle">Was sagen die Modelle?</div></div>
-        <div class="confidencePill ok" id="modelConfidenceBadge">Konsens wird berechnet</div>
+        <div class="modelHeadBadges"><div class="regionPill" id="modelRegionBadge">Region wird erkannt …</div><div class="confidencePill ok" id="modelConfidenceBadge">Konsens wird berechnet</div></div>
       </div>
-      <div class="modelGrid" id="modelGrid">
-        <div class="modelCard" data-model="arome">
-          <div class="modelTop"><div><div class="modelName">GeoSphere AROME</div><div class="modelMeta">Österreich · hochauflösend</div></div><div class="modelState" id="modelState_arome">–</div></div>
-          <div class="modelStats"><div class="modelStat"><span>Wolken</span><b id="modelCloud_arome">–</b></div><div class="modelStat"><span>Niederschlag max.</span><b id="modelRain_arome">–</b></div></div>
-        </div>
-        <div class="modelCard" data-model="icon">
-          <div class="modelTop"><div><div class="modelName">DWD ICON</div><div class="modelMeta">Mitteleuropa · unabhängig</div></div><div class="modelState" id="modelState_icon">–</div></div>
-          <div class="modelStats"><div class="modelStat"><span>Wolken</span><b id="modelCloud_icon">–</b></div><div class="modelStat"><span>Niederschlag max.</span><b id="modelRain_icon">–</b></div></div>
-        </div>
-        <div class="modelCard" data-model="ecmwf">
-          <div class="modelTop"><div><div class="modelName">ECMWF IFS</div><div class="modelMeta">Global · Referenzmodell</div></div><div class="modelState" id="modelState_ecmwf">–</div></div>
-          <div class="modelStats"><div class="modelStat"><span>Wolken</span><b id="modelCloud_ecmwf">–</b></div><div class="modelStat"><span>Niederschlag max.</span><b id="modelRain_ecmwf">–</b></div></div>
-        </div>
-      </div>
+      <div class="modelGrid" id="modelGrid"><div class="empty">Standort wählen, um die regionalen Wettermodelle zu laden.</div></div>
       <div class="consensusBox"><div class="consensusScore" id="consensusScore">–</div><div class="consensusText" id="consensusText"><b>Noch keine Daten.</b><br>Je größer die Streuung zwischen den Modellen, desto vorsichtiger wird der Astro-Score.</div></div>
-      <div class="note">Die Wolkenzahl im Astro-Score ist absichtlich konservativ: Der Mittelwert wird in Richtung des wolkigsten verfügbaren Modells verschoben. Niederschlagsrisiko wird aus Modellübereinstimmung und vorhergesagter Niederschlagsmenge abgeleitet.</div>
+      <div class="note">Die Modellwahl erfolgt automatisch aus den Koordinaten. In Österreich werden GeoSphere AROME, ICON‑D2 und ECMWF verwendet; in der Schweiz MeteoSwiss CH1/CH2, ICON‑D2 und ECMWF. Verwandte Modelle desselben Wetterdienstes werden bei der Konsensbildung nicht wie vollständig unabhängige Stimmen doppelt gezählt. Die Wolkenzahl bleibt bewusst konservativ.</div>
+    </section>
+
+    <section class="panel card wide" id="lpCard">
+      <div class="cardHead">
+        <div><div class="eyebrow">Lichtverschmutzung</div><div class="cardTitle">Relative Lichtglocke nach Himmelsrichtung</div></div>
+        <div class="lpStatus ok" id="lpStatus">Wird nach Standortwahl berechnet …</div>
+      </div>
+      <div class="lpGrid">
+        <div class="lpCompassWrap"><canvas class="lpCompass" id="lpCompass" width="520" height="520" aria-label="Lichtglocken-Kompass"></canvas></div>
+        <div class="lpInfo">
+          <div class="lpStats">
+            <div class="lpStat"><span>Standortbelastung</span><b id="lpSite">–</b></div>
+            <div class="lpStat"><span>Stärkste Lichtglocke</span><b id="lpWorstDir">–</b></div>
+            <div class="lpStat"><span>Lokale VIIRS-Radiance</span><b id="lpLocalRad">–</b></div>
+            <div class="lpStat"><span>Zielrichtung</span><b id="lpTargetImpact">kein Ziel</b></div>
+          </div>
+          <div class="lpSummary" id="lpSummary"><b>Relative Analyse:</b> Lichtquellen rund um den Standort werden nach Richtung und Entfernung gewichtet. Die Zielplanung berücksichtigt anschließend, wie hoch und in welcher Richtung das Objekt steht.</div>
+          <div class="lpSourceLink" id="lpSource">Datenquelle wird geladen …</div>
+        </div>
+      </div>
     </section>
 
     <section class="panel card wide">
@@ -419,6 +478,8 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
           <div class="targetStat"><span>Kulmination</span><b id="targetTransit">–</b></div>
           <div class="targetStat"><span>Mondabstand</span><b id="targetMoonSep">–</b></div>
           <div class="targetStat"><span>Über 30°</span><b id="targetAbove30">–</b></div>
+          <div class="targetStat"><span>Azimut im besten Moment</span><b id="targetAz">–</b></div>
+          <div class="targetStat"><span>Lichtverschmutzung</span><b id="targetLp">–</b></div>
         </div>
         <div class="targetSummary" id="targetSummary">–</div>
       </div>
@@ -436,6 +497,7 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
         <div><div class="factorTop"><span>Sichtweite</span><b id="fVis">–</b></div><div class="bar"><i id="bVis" style="width:0"></i></div></div>
         <div><div class="factorTop"><span>Niederschlag</span><b id="fPrecip">–</b></div><div class="bar"><i id="bPrecip" style="width:0"></i></div></div>
         <div><div class="factorTop"><span>Modellkonsens</span><b id="fConsensus">–</b></div><div class="bar"><i id="bConsensus" style="width:0"></i></div></div>
+        <div><div class="factorTop"><span>Lichtverschmutzung</span><b id="fLP">–</b></div><div class="bar"><i id="bLP" style="width:0"></i></div></div>
       </div>
       <div class="note">
         Der Astro-Score ist bewusst eine verständliche Heuristik, kein wissenschaftlicher „Seeing“-Forecast.
@@ -444,10 +506,11 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
     </section>
   </main>
 
-  <div class="footer">Wettermodelle via Open‑Meteo · GeoSphere AROME + DWD ICON + ECMWF IFS · konservative Nacht- und Zielbewertung · Filter-/Mond-Modell · Sonne/Mond: SunCalc</div>
+  <div class="footer">Wettermodelle regional via Open‑Meteo · AT: GeoSphere AROME + ICON‑D2 + ECMWF · CH: MeteoSwiss CH1/CH2 + ICON‑D2 + ECMWF · Lichtemissionen: VIIRS VNL 2024 (EOG/Zenodo COG) · Sonne/Mond: SunCalc</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/geotiff@3.1.0"></script>
 <script>
 (() => {
 "use strict";
@@ -461,12 +524,23 @@ const nightDate = $("nightDate");
 const modeEl = $("mode");
 const targetEl = $("target");
 const filterEl = $("filter");
+const savedSiteSelect = $("savedSiteSelect");
+const coordEditor = $("coordEditor");
+const siteNameInput = $("siteNameInput");
+const latInput = $("latInput");
+const lonInput = $("lonInput");
 
 let place = null;
 let weather = null;
 let modelWeather = [];
+let activeModelConfigs = [];
+let activeModelRegion = {code:"GENERAL",label:"Allgemein"};
 let searchTimer = null;
 let currentNightHours = [];
+let nightDateUserSelected = false;
+let lightPollution = {ready:false,source:"none",profile:new Array(24).fill(0),rawProfile:new Array(24).fill(0),siteSeverity:0,localRadiance:NaN,error:null};
+let lightPollutionToken = 0;
+let lightPollutionTargetAz = null;
 
 const pad = n => String(n).padStart(2,"0");
 const clamp = (x,a=0,b=100) => Math.max(a,Math.min(b,x));
@@ -476,8 +550,28 @@ function todayISO(){
   const d = new Date();
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
-nightDate.value = todayISO();
-nightDate.min = todayISO();
+function isoDateInTimeZone(date, tz){
+  if(!tz) return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+  const parts=new Intl.DateTimeFormat("en-CA",{
+    timeZone:tz,year:"numeric",month:"2-digit",day:"2-digit"
+  }).formatToParts(date);
+  const obj=Object.fromEntries(parts.filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
+  return `${obj.year}-${obj.month}-${obj.day}`;
+}
+function hourInTimeZone(date, tz){
+  if(!tz) return date.getHours();
+  const parts=new Intl.DateTimeFormat("en-US",{
+    timeZone:tz,hour:"2-digit",hourCycle:"h23"
+  }).formatToParts(date);
+  return Number(parts.find(p=>p.type==="hour")?.value ?? 0);
+}
+function provisionalCurrentNightISO(){
+  const now=new Date();
+  const today=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  return now.getHours()<12 ? datePlus(today,-1) : today;
+}
+nightDate.value = provisionalCurrentNightISO();
+nightDate.min = datePlus(todayISO(),-1);
 const maxD = new Date(); maxD.setDate(maxD.getDate()+6);
 nightDate.max = `${maxD.getFullYear()}-${pad(maxD.getMonth()+1)}-${pad(maxD.getDate())}`;
 
@@ -491,6 +585,80 @@ function setLoading(on){
 }
 function fmtPlace(p){
   return [p.name,p.admin1,p.country].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(", ");
+}
+function formatCoordinates(p){
+  if(!p || !Number.isFinite(Number(p.latitude)) || !Number.isFinite(Number(p.longitude))) return "Noch keine Position gewählt";
+  const lat=Number(p.latitude), lon=Number(p.longitude);
+  return `${Math.abs(lat).toFixed(5)}° ${lat>=0?"N":"S"} · ${Math.abs(lon).toFixed(5)}° ${lon>=0?"E":"W"}`;
+}
+function locationSourceText(p){
+  if(!p) return "Ortssuche, Geräteposition oder Koordinaten verwenden.";
+  if(p.locationSource==="device"){
+    const a=Number(p.accuracy);
+    return Number.isFinite(a)?`Geräteposition · gemeldete Genauigkeit ±${a<100?Math.round(a):Math.round(a/10)*10} m`:`Geräteposition`;
+  }
+  if(p.locationSource==="manual") return "Manuell gesetzte exakte Koordinaten";
+  if(p.locationSource==="saved") return "Gespeicherter Beobachtungsplatz";
+  if(p.locationSource==="search") return "Ortssuche · Koordinaten des Suchtreffers (nicht zwingend dein Beobachtungsplatz)";
+  return "Gespeicherte Position";
+}
+function updateLocationUI(){
+  $("coordDisplay").textContent=formatCoordinates(place);
+  $("coordSource").textContent=locationSourceText(place);
+}
+function openCoordinateEditor(){
+  if(place){
+    siteNameInput.value=place.name||"Beobachtungsplatz";
+    latInput.value=Number(place.latitude).toFixed(6);
+    lonInput.value=Number(place.longitude).toFixed(6);
+  }else{
+    siteNameInput.value="";latInput.value="";lonInput.value="";
+  }
+  coordEditor.classList.add("open");
+  setTimeout(()=>siteNameInput.focus(),0);
+}
+function closeCoordinateEditor(){coordEditor.classList.remove("open")}
+function readCoordinateEditor(){
+  const lat=Number(latInput.value),lon=Number(lonInput.value);
+  if(!Number.isFinite(lat)||lat < -90||lat > 90){setStatus("Bitte einen gültigen Breitengrad zwischen −90 und +90 eingeben.",true);return null}
+  if(!Number.isFinite(lon)||lon < -180||lon > 180){setStatus("Bitte einen gültigen Längengrad zwischen −180 und +180 eingeben.",true);return null}
+  const name=siteNameInput.value.trim()||"Beobachtungsplatz";
+  return {name,latitude:lat,longitude:lon,timezone:"auto",locationSource:"manual"};
+}
+function getSavedSites(){
+  try{
+    const a=JSON.parse(localStorage.getItem("astroNightSites")||"[]");
+    return Array.isArray(a)?a.filter(x=>x&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude))):[];
+  }catch(_){return []}
+}
+function writeSavedSites(sites){try{localStorage.setItem("astroNightSites",JSON.stringify(sites))}catch(_){}}
+function siteId(site){return `${Number(site.latitude).toFixed(6)},${Number(site.longitude).toFixed(6)}`}
+function renderSavedSites(selected=""){
+  const sites=getSavedSites();
+  savedSiteSelect.innerHTML='<option value="">Beobachtungsplatz laden …</option>';
+  sites.forEach(site=>{
+    const o=document.createElement("option");
+    o.value=site.id||siteId(site);o.textContent=site.name||formatCoordinates(site);savedSiteSelect.appendChild(o);
+  });
+  savedSiteSelect.value=selected;
+  $("deleteSiteBtn").disabled=!savedSiteSelect.value;
+}
+function persistCurrentPlace(){
+  try{localStorage.setItem("astroNightPlace",JSON.stringify(place))}catch(_){}
+  updateLocationUI();
+}
+async function useManualCoordinates(saveFavorite=false){
+  const next=readCoordinateEditor();if(!next)return;
+  place=next;locationInput.value=next.name;persistCurrentPlace();
+  if(saveFavorite){
+    const sites=getSavedSites();const id=siteId(next);
+    const item={...next,id,locationSource:"saved"};
+    const i=sites.findIndex(x=>(x.id||siteId(x))===id);
+    if(i>=0)sites[i]=item;else sites.push(item);
+    sites.sort((a,b)=>(a.name||"").localeCompare(b.name||"","de"));writeSavedSites(sites);renderSavedSites(id);
+    setStatus(`Beobachtungsplatz „${next.name}“ gespeichert.`);
+  }
+  closeCoordinateEditor();await loadWeather();
 }
 function localDateString(date, tz){
   return new Intl.DateTimeFormat("de-AT",{timeZone:tz,year:"numeric",month:"2-digit",day:"2-digit"}).format(date);
@@ -606,12 +774,12 @@ function visibilityScore(v){
   return clamp(km*6);
 }
 const FILTER_PROFILES={
-  broadband:{label:"Broadband",moonFactor:1.00,targetMax:88},
-  lp:{label:"LP / CLS",moonFactor:.82,targetMax:89},
-  dual:{label:"Dual-Narrowband",moonFactor:.32,targetMax:90},
-  ha:{label:"Hα",moonFactor:.15,targetMax:92},
-  oiii:{label:"OIII",moonFactor:.45,targetMax:88},
-  sii:{label:"SII",moonFactor:.20,targetMax:91}
+  broadband:{label:"Broadband",moonFactor:1.00,targetMax:88,lpFactor:1.00},
+  lp:{label:"LP / CLS",moonFactor:.82,targetMax:89,lpFactor:.68},
+  dual:{label:"Dual-Narrowband",moonFactor:.32,targetMax:90,lpFactor:.24},
+  ha:{label:"Hα",moonFactor:.15,targetMax:92,lpFactor:.12},
+  oiii:{label:"OIII",moonFactor:.45,targetMax:88,lpFactor:.34},
+  sii:{label:"SII",moonFactor:.20,targetMax:91,lpFactor:.15}
 };
 function currentFilter(){return FILTER_PROFILES[filterEl?.value]||FILTER_PROFILES.broadband}
 function relaxedMoonCap(base,profile,max=95){return base+(max-base)*(1-profile.moonFactor)}
@@ -629,11 +797,155 @@ function moonScore(mode, illum, alt, filterKey="broadband"){
   return clamp(100-penalty);
 }
 function weights(mode){
-  if(mode==="milky") return {cloud:.29,wind:.08,dew:.08,moon:.22,dark:.17,vis:.05,precip:.11};
+  if(mode==="milky") return {cloud:.26,wind:.07,dew:.07,moon:.20,dark:.16,vis:.04,precip:.10,lp:.10};
   if(mode==="moon")  return {cloud:.35,wind:.16,dew:.10,moon:.16,dark:.03,vis:.06,precip:.14};
   if(mode==="planets")return {cloud:.34,wind:.20,dew:.10,moon:.02,dark:.07,vis:.10,precip:.17};
-  return {cloud:.30,wind:.11,dew:.10,moon:.17,dark:.14,vis:.05,precip:.13};
+  return {cloud:.28,wind:.10,dew:.09,moon:.16,dark:.13,vis:.04,precip:.12,lp:.08};
 }
+const VIIRS_COG_URL="https://zenodo.org/records/17294744/files/nightlights.average_viirs.v21_m_500m_s_20240101_20241231_go_epsg4326_v20250904.tif?download=1";
+const LP_RADIUS_KM=120, LP_BINS=24, LP_GRID=161;
+const FALLBACK_LIGHTS=[
+  ["Wien",48.2082,16.3738,2.15],["Graz",47.0707,15.4395,.55],["Linz",48.3069,14.2858,.48],
+  ["Salzburg",47.8095,13.0550,.36],["Innsbruck",47.2692,11.4041,.32],["Klagenfurt",46.6247,14.3053,.25],
+  ["St. Pölten",48.2035,15.6256,.18],["Wiener Neustadt",47.8150,16.2440,.20],["Eisenstadt",47.8457,16.5233,.12],
+  ["Bratislava",48.1486,17.1077,.55],["Brno",49.1951,16.6068,.62],["Győr",47.6875,17.6504,.26],
+  ["Sopron",47.6817,16.5845,.15],["Maribor",46.5547,15.6459,.22],["München",48.1351,11.5820,1.35],
+  ["Prag",50.0755,14.4378,1.45],["Budapest",47.4979,19.0402,1.75]
+];
+function haversineKm(lat1,lon1,lat2,lon2){
+  const r=Math.PI/180,R=6371,dLat=(lat2-lat1)*r,dLon=(lon2-lon1)*r;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));
+}
+function bearingDeg(lat1,lon1,lat2,lon2){
+  const r=Math.PI/180,p1=lat1*r,p2=lat2*r,dl=(lon2-lon1)*r;
+  return (Math.atan2(Math.sin(dl)*Math.cos(p2),Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl))*180/Math.PI+360)%360;
+}
+function angularDiff(a,b){return Math.abs(((a-b+540)%360)-180)}
+function compassName(az){
+  const names=["N","NNO","NO","ONO","O","OSO","SO","SSO","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+  return names[Math.round(((az%360)+360)%360/22.5)%16];
+}
+function medianFinite(a){const x=a.filter(Number.isFinite).sort((a,b)=>a-b);if(!x.length)return NaN;const m=Math.floor(x.length/2);return x.length%2?x[m]:(x[m-1]+x[m])/2}
+function siteSeverityFromRadiance(rad){
+  if(!Number.isFinite(rad)) return 35;
+  return clamp(100*Math.log1p(Math.max(0,rad)*2)/Math.log1p(100));
+}
+function lpSiteScore(mode,filterKey="broadband"){
+  if(mode!=="deep"&&mode!=="milky") return 100;
+  if(!lightPollution.ready) return 75;
+  const p=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
+  return clamp(100-lightPollution.siteSeverity*p.lpFactor);
+}
+function lpDirectionAt(az){
+  if(!lightPollution.ready||!lightPollution.profile?.length) return 35;
+  const step=360/LP_BINS, x=((az%360)+360)%360/step, i0=Math.floor(x)%LP_BINS, i1=(i0+1)%LP_BINS, t=x-Math.floor(x);
+  return lightPollution.profile[i0]*(1-t)+lightPollution.profile[i1]*t;
+}
+function lpImpactForTarget(az,alt,filterKey="broadband"){
+  if(!lightPollution.ready) return {impact:25,score:75,dir:25};
+  const p=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
+  const dir=lpDirectionAt(az), horizon=Math.exp(-Math.max(0,alt)/35);
+  const raw=clamp(lightPollution.siteSeverity*.60 + dir*.65*horizon);
+  const impact=clamp(raw*p.lpFactor);
+  return {impact,score:clamp(100-impact),dir};
+}
+function lpLevel(x){return x>=78?"sehr hoch":x>=58?"hoch":x>=38?"mittel":x>=20?"gering":"sehr gering"}
+function lpClassForSeverity(x){return x>=65?"bad":x>=35?"ok":"good"}
+function normalizeLightProfile(raw,siteSeverity){
+  const maxRaw=Math.max(.001,...raw), abs=raw.map(v=>clamp(100*(1-Math.exp(-v/45))));
+  // Keep an absolute component, while retaining directional contrast for dark sites.
+  return abs.map((v,i)=>clamp(.78*v+.22*(raw[i]/maxRaw*100)*Math.min(1,.35+siteSeverity/100)));
+}
+function analyzeLightRaster(data,width,height,bbox){
+  const [minLon,minLat,maxLon,maxLat]=bbox, rawProfile=new Array(LP_BINS).fill(0), local=[];
+  const binStep=360/LP_BINS;
+  for(let y=0;y<height;y++) for(let x=0;x<width;x++){
+    let v=Number(data[y*width+x]); if(!Number.isFinite(v)||v<=0||v>100000) continue;
+    const rad=Math.max(0,v/10); // Zenodo COG stores Annual VNL V2 values scaled by 10.
+    const lat=maxLat-(y+.5)/height*(maxLat-minLat), lon=minLon+(x+.5)/width*(maxLon-minLon);
+    const d=haversineKm(place.latitude,place.longitude,lat,lon); if(d>LP_RADIUS_KM) continue;
+    if(d<=6) local.push(rad);
+    if(d<1.5||rad<.03) continue;
+    const b=bearingDeg(place.latitude,place.longitude,lat,lon);
+    const emission=Math.log1p(rad*1.6), distanceWeight=Math.exp(-d/42)/Math.pow(1+d/18,.55);
+    const c=emission*distanceWeight;
+    for(let i=0;i<LP_BINS;i++){
+      const center=i*binStep, diff=angularDiff(b,center);
+      if(diff>50) continue;
+      rawProfile[i]+=c*Math.exp(-.5*(diff/18)**2);
+    }
+  }
+  const localRad=medianFinite(local), siteSeverity=siteSeverityFromRadiance(localRad);
+  return {ready:true,source:"viirs",rawProfile,profile:normalizeLightProfile(rawProfile,siteSeverity),siteSeverity,localRadiance:localRad,error:null};
+}
+function fallbackLightProfile(){
+  const raw=new Array(LP_BINS).fill(0), local=[]; const step=360/LP_BINS;
+  for(const [name,lat,lon,power] of FALLBACK_LIGHTS){
+    const d=haversineKm(place.latitude,place.longitude,lat,lon); if(d>220) continue;
+    const b=bearingDeg(place.latitude,place.longitude,lat,lon);
+    if(d<12) local.push(Math.max(.2,power*5));
+    const c=power*38*Math.exp(-d/50)/Math.pow(1+d/22,.65);
+    for(let i=0;i<LP_BINS;i++){const diff=angularDiff(b,i*step);if(diff<=55)raw[i]+=c*Math.exp(-.5*(diff/20)**2)}
+  }
+  const localRad=local.length?Math.max(...local):.25, siteSeverity=siteSeverityFromRadiance(localRad);
+  return {ready:true,source:"fallback",rawProfile:raw,profile:normalizeLightProfile(raw,siteSeverity),siteSeverity,localRadiance:NaN,error:"VIIRS konnte nicht direkt geladen werden"};
+}
+function lpCacheKey(){return place?`astroNightLP:${Number(place.latitude).toFixed(2)}:${Number(place.longitude).toFixed(2)}`:""}
+function readLpCache(){
+  try{const v=JSON.parse(localStorage.getItem(lpCacheKey()));if(v&&Date.now()-v.saved<180*86400000&&Array.isArray(v.profile)&&v.profile.length===LP_BINS)return {...v,ready:true}}catch(_){} return null;
+}
+function writeLpCache(v){try{localStorage.setItem(lpCacheKey(),JSON.stringify({...v,saved:Date.now()}))}catch(_){}}
+async function loadLightPollution(){
+  if(!place)return; const token=++lightPollutionToken; lightPollutionTargetAz=null;
+  const cached=readLpCache(); if(cached){lightPollution=cached;renderLightPollutionCard();if(weather)render();return}
+  lightPollution={ready:false,source:"loading",profile:new Array(LP_BINS).fill(0),rawProfile:new Array(LP_BINS).fill(0),siteSeverity:0,localRadiance:NaN,error:null};renderLightPollutionCard();
+  try{
+    if(!window.GeoTIFF?.fromUrl) throw new Error("GeoTIFF-Bibliothek nicht geladen");
+    const lat=Number(place.latitude),lon=Number(place.longitude),dLat=LP_RADIUS_KM/111.2,dLon=LP_RADIUS_KM/(111.2*Math.max(.25,Math.cos(lat*Math.PI/180)));
+    const bbox=[lon-dLon,lat-dLat,lon+dLon,lat+dLat];
+    const tiff=await window.GeoTIFF.fromUrl(VIIRS_COG_URL,{allowFullFile:false,maxRanges:8});
+    const raster=await tiff.readRasters({bbox,width:LP_GRID,height:LP_GRID,samples:[0],interleave:true});
+    if(token!==lightPollutionToken)return;
+    lightPollution=analyzeLightRaster(raster,LP_GRID,LP_GRID,bbox);writeLpCache(lightPollution);
+  }catch(e){if(token!==lightPollutionToken)return;lightPollution=fallbackLightProfile();lightPollution.error=e?.message||String(e)}
+  renderLightPollutionCard(); if(weather)render();
+}
+function drawLpCompass(targetAz=null){
+  const canvas=$("lpCompass");if(!canvas)return;const ctx=canvas.getContext("2d"),w=canvas.width,h=canvas.height,cx=w/2,cy=h/2,R=Math.min(w,h)*.39;
+  ctx.clearRect(0,0,w,h);ctx.save();ctx.translate(cx,cy);
+  ctx.lineWidth=2;ctx.strokeStyle="#263449";for(const f of [.33,.66,1]){ctx.beginPath();ctx.arc(0,0,R*f,0,Math.PI*2);ctx.stroke()}
+  ctx.font="700 24px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#9babc3";
+  [["N",0,-R-34],["O",R+34,0],["S",0,R+34],["W",-R-34,0]].forEach(([t,x,y])=>ctx.fillText(t,x,y));
+  if(lightPollution.ready){
+    const pts=lightPollution.profile.map((v,i)=>{const a=(i/LP_BINS*360-90)*Math.PI/180,r=R*(.20+.80*v/100);return [Math.cos(a)*r,Math.sin(a)*r]});
+    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.fillStyle="rgba(255,125,125,.18)";ctx.fill();ctx.strokeStyle="rgba(255,160,120,.85)";ctx.lineWidth=5;ctx.stroke();
+    for(let i=0;i<LP_BINS;i++){const v=lightPollution.profile[i],a=(i/LP_BINS*360-90)*Math.PI/180,r=R*(.20+.80*v/100);ctx.beginPath();ctx.arc(Math.cos(a)*r,Math.sin(a)*r,4,0,Math.PI*2);ctx.fillStyle=v>=65?"#ff7d7d":v>=35?"#ffd166":"#72e29b";ctx.fill()}
+  }
+  if(Number.isFinite(targetAz)){
+    const a=(targetAz-90)*Math.PI/180;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*R*1.08,Math.sin(a)*R*1.08);ctx.strokeStyle="#8fb8ff";ctx.lineWidth=4;ctx.stroke();
+    ctx.beginPath();ctx.arc(Math.cos(a)*R*1.08,Math.sin(a)*R*1.08,7,0,Math.PI*2);ctx.fillStyle="#8fb8ff";ctx.fill();
+  }
+  ctx.restore();
+}
+function renderLightPollutionCard(targetAz=lightPollutionTargetAz,targetImpact=null){
+  const st=$("lpStatus");if(!st)return;
+  if(!lightPollution.ready){st.textContent="VIIRS-Lichtdaten werden geladen …";st.className="lpStatus ok";$("lpSite").textContent="…";$("lpWorstDir").textContent="…";$("lpLocalRad").textContent="…";drawLpCompass();return}
+  const max=Math.max(...lightPollution.profile),idx=lightPollution.profile.indexOf(max),az=idx*360/LP_BINS;
+  $("lpSite").textContent=`${lpLevel(lightPollution.siteSeverity)} · ${Math.round(lightPollution.siteSeverity)}/100`;
+  $("lpWorstDir").textContent=`${compassName(az)} · ${Math.round(max)}/100`;
+  $("lpLocalRad").textContent=Number.isFinite(lightPollution.localRadiance)?`${lightPollution.localRadiance.toFixed(2)} nW/cm²/sr`:"nur Fallback";
+  if(Number.isFinite(targetAz)){
+    const imp=targetImpact??lpImpactForTarget(targetAz,30,filterEl.value).impact;
+    $("lpTargetImpact").textContent=`${compassName(targetAz)} · ${lpLevel(imp)} (${Math.round(imp)})`;
+  }else $("lpTargetImpact").textContent="kein Ziel";
+  const fallback=lightPollution.source==="fallback";
+  st.textContent=fallback?"Näherungsmodell aktiv":"VIIRS 2024 geladen";st.className=`lpStatus ${fallback?"ok":lpClassForSeverity(lightPollution.siteSeverity)}`;
+  $("lpSummary").innerHTML=`<b>${fallback?"Fallback-Näherung":"VIIRS-basierte Richtungsanalyse"}:</b> Der Standort liegt relativ bei <b>${lpLevel(lightPollution.siteSeverity)}</b> Lichtbelastung. Die stärkste Lichtglocke liegt Richtung <b>${compassName(az)}</b>. Für die Zielbewertung nimmt ihr Einfluss mit zunehmender Objekthöhe ab und wird je nach Filter unterschiedlich stark gewichtet.`;
+  $("lpSource").textContent=fallback?`VIIRS-Zugriff fehlgeschlagen (${lightPollution.error||"unbekannt"}); ersatzweise grobes Städtemodell für Mitteleuropa.`:"Quelle: Annual VNL V2 / VIIRS 2024, ~500 m. Die Lichtglocke ist eine AstroNight-Heuristik aus Oberflächenradiance, Entfernung und Richtung – keine direkte SQM-/Bortle-Messung.";
+  drawLpCompass(targetAz);
+}
+
 function scoreHour(h, mode, illum, filterKey="broadband"){
   const confidence=Number.isFinite(h.confidence)?h.confidence:55;
   const fs = {
@@ -644,7 +956,8 @@ function scoreHour(h, mode, illum, filterKey="broadband"){
     dark:darkScore(h.sunAlt),
     vis:visibilityScore(h.visibility),
     precip:precipScore(h.precip),
-    consensus:confidence
+    consensus:confidence,
+    lp:lpSiteScore(mode,filterKey)
   };
   const w=weights(mode);
   let total=Object.keys(w).reduce((sum,k)=>sum+fs[k]*w[k],0);
@@ -682,6 +995,13 @@ function scoreHour(h, mode, illum, filterKey="broadband"){
     if(h.cloud>=50) total=Math.min(total,relaxedMoonCap(12,filterProfile));
     else if(h.cloud>=25) total=Math.min(total,relaxedMoonCap(24,filterProfile));
   }
+  // Standort-Lichtverschmutzung begrenzt vor allem Broadband-Aufnahmen; Narrowband entspannt das Limit.
+  if(lightPollution.ready && (mode==="deep"||mode==="milky")){
+    const siteImpact=lightPollution.siteSeverity*filterProfile.lpFactor;
+    if(mode==="milky" && siteImpact>=70) total=Math.min(total,45);
+    else if(mode==="deep" && siteImpact>=80) total=Math.min(total,62);
+    else if(mode==="deep" && siteImpact>=60) total=Math.min(total,74);
+  }
   return {...fs,total:clamp(total)};
 }
 function colorClass(s){return s>=75?"good":s>=50?"ok":"bad"}
@@ -708,22 +1028,75 @@ async function searchPlaces(q){
   }catch(e){setStatus(e.message,true)}
 }
 function choosePlace(p){
-  place=p;
-  locationInput.value=fmtPlace(p);
+  place={...p,locationSource:"search"};
+  locationInput.value=fmtPlace(place);
   resultsEl.classList.remove("open");
-  localStorage.setItem("astroNightPlace",JSON.stringify(p));
+  persistCurrentPlace();
   loadWeather();
 }
-async function reversePlace(lat,lon){
-  // Open-Meteo geocoding has no reverse endpoint; keep a readable coordinate label.
-  return {name:"Mein Standort",latitude:lat,longitude:lon,timezone:"auto"};
+async function reversePlace(lat,lon,accuracy){
+  // The exact coordinates are the calculation basis; a readable label is secondary.
+  return {name:"Mein Standort",latitude:lat,longitude:lon,timezone:"auto",locationSource:"device",accuracy};
 }
 
-const MODEL_CONFIGS=[
-  {key:"arome",name:"GeoSphere AROME",ids:["geosphere_arome","geosphere_seamless"],weight:1.35},
-  {key:"icon",name:"DWD ICON",ids:["icon_seamless","icon_eu"],weight:1.10},
-  {key:"ecmwf",name:"ECMWF IFS",ids:["ecmwf_ifs025","ecmwf_ifs"],weight:1.00}
-];
+const MODEL_SETS={
+  AT:{
+    code:"AT",label:"Österreich",
+    models:[
+      {key:"arome",name:"GeoSphere AROME",meta:"Österreich/Alpen · ~2,5 km · ~60 h",ids:["geosphere_arome_austria","geosphere_seamless"],weight:1.35,provider:"GeoSphere"},
+      {key:"icon_d2",name:"DWD ICON-D2",meta:"Mitteleuropa · ~2 km · ~48 h",ids:["icon_d2","icon_seamless"],weight:1.15,provider:"DWD"},
+      {key:"ecmwf",name:"ECMWF IFS",meta:"Global · ~9 km · Referenz",ids:["ecmwf_ifs","ecmwf_ifs025"],weight:1.00,provider:"ECMWF"}
+    ]
+  },
+  CH:{
+    code:"CH",label:"Schweiz",
+    models:[
+      {key:"ch1",name:"MeteoSwiss ICON-CH1",meta:"Schweiz · ~1 km · ~33 h",ids:["meteoswiss_icon_ch1","meteoswiss_icon_seamless"],weight:1.35,provider:"MeteoSwiss"},
+      {key:"ch2",name:"MeteoSwiss ICON-CH2",meta:"Schweiz · ~2 km · ~120 h",ids:["meteoswiss_icon_ch2","meteoswiss_icon_seamless"],weight:1.25,provider:"MeteoSwiss"},
+      {key:"icon_d2",name:"DWD ICON-D2",meta:"Mitteleuropa · ~2 km · ~48 h",ids:["icon_d2","icon_seamless"],weight:1.10,provider:"DWD"},
+      {key:"ecmwf",name:"ECMWF IFS",meta:"Global · ~9 km · Referenz",ids:["ecmwf_ifs","ecmwf_ifs025"],weight:1.00,provider:"ECMWF"}
+    ]
+  },
+  GENERAL:{
+    code:"GENERAL",label:"Europa / allgemein",
+    models:[
+      {key:"icon",name:"DWD ICON",meta:"Europa/global · regionaler Check",ids:["icon_eu","icon_seamless","icon_global"],weight:1.10,provider:"DWD"},
+      {key:"ecmwf",name:"ECMWF IFS",meta:"Global · ~9 km · Referenz",ids:["ecmwf_ifs","ecmwf_ifs025"],weight:1.00,provider:"ECMWF"}
+    ]
+  }
+};
+// Coarse country polygons are only used when no country_code is available (GPS/manual coordinates).
+// The actual model request itself still verifies whether a model provides usable data at the coordinate.
+const REGION_POLYGONS={
+  CH:[[5.95,46.20],[6.10,46.00],[6.80,45.82],[7.55,45.84],[8.35,45.82],[9.10,46.02],[10.48,46.55],[10.45,47.35],[9.75,47.58],[8.55,47.82],[7.55,47.72],[6.65,47.58],[5.95,47.30]],
+  AT:[[9.45,47.60],[10.35,46.85],[11.70,46.55],[13.10,46.40],[14.55,46.35],[15.75,46.65],[16.95,47.05],[17.15,48.00],[16.75,48.85],[15.20,49.02],[13.55,48.80],[12.15,48.35],[10.85,47.85]]
+};
+function pointInPolygon(lat,lon,poly){
+  let inside=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const [xi,yi]=poly[i],[xj,yj]=poly[j];
+    const crosses=((yi>lat)!=(yj>lat)) && (lon < (xj-xi)*(lat-yi)/(yj-yi+1e-12)+xi);
+    if(crosses) inside=!inside;
+  }
+  return inside;
+}
+function detectModelRegion(p){
+  const cc=String(p?.country_code||p?.countryCode||"").toUpperCase();
+  if(cc==="AT") return MODEL_SETS.AT;
+  if(cc==="CH") return MODEL_SETS.CH;
+  const lat=Number(p?.latitude),lon=Number(p?.longitude);
+  if(Number.isFinite(lat)&&Number.isFinite(lon)){
+    if(pointInPolygon(lat,lon,REGION_POLYGONS.CH)) return MODEL_SETS.CH;
+    if(pointInPolygon(lat,lon,REGION_POLYGONS.AT)) return MODEL_SETS.AT;
+  }
+  return MODEL_SETS.GENERAL;
+}
+function configureRegionalModels(){
+  const region=detectModelRegion(place);
+  activeModelRegion={code:region.code,label:region.label};
+  activeModelConfigs=region.models.map(x=>({...x}));
+  return region;
+}
 const WEATHER_VARS=[
   "temperature_2m","relative_humidity_2m","dew_point_2m","precipitation",
   "cloud_cover","cloud_cover_low","cloud_cover_mid","cloud_cover_high","visibility",
@@ -739,11 +1112,13 @@ async function fetchOneModel(cfg){
   let lastError=null;
   for(const modelId of cfg.ids){
     try{
-      const url=`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&hourly=${WEATHER_VARS.join(",")}&models=${modelId}&timezone=auto&forecast_days=7`;
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&hourly=${WEATHER_VARS.join(",")}&models=${modelId}&timezone=auto&past_days=1&forecast_days=7`;
       const r=await fetch(url);
       if(!r.ok){lastError=new Error(`${r.status}`);continue}
       const data=await r.json();
       if(!data.hourly?.time?.length){lastError=new Error("keine Daten");continue}
+      const usable=(data.hourly.cloud_cover||[]).some(v=>Number.isFinite(Number(v)));
+      if(!usable){lastError=new Error("für diese Koordinate keine nutzbaren Daten");continue}
       const index=new Map(data.hourly.time.map((t,i)=>[t,i]));
       return {...cfg,modelId,data,index,available:true};
     }catch(e){lastError=e}
@@ -751,7 +1126,7 @@ async function fetchOneModel(cfg){
   return {...cfg,available:false,error:lastError?.message||"nicht verfügbar"};
 }
 async function fetchBestMatchFallback(){
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&hourly=${WEATHER_VARS.join(",")}&timezone=auto&forecast_days=7`;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&hourly=${WEATHER_VARS.join(",")}&timezone=auto&past_days=1&forecast_days=7`;
   const r=await fetch(url); if(!r.ok) throw new Error(`Wetterdienst antwortet mit ${r.status}`);
   const data=await r.json();
   return {key:"fallback",name:"Open‑Meteo Best Match",weight:1,modelId:"best_match",data,index:new Map(data.hourly.time.map((t,i)=>[t,i])),available:true,fallback:true};
@@ -772,17 +1147,24 @@ function buildConsensus(models){
     })).filter(r=>Number.isFinite(r.cloud));
     if(!rows.length)continue;
     const vals=k=>rows.map(r=>r[k]).filter(Number.isFinite);
-    const wm=k=>weightedMean(rows.map(r=>({value:r[k],weight:r.m.weight})));
+    const providerCounts=new Map();
+    rows.forEach(r=>providerCounts.set(r.m.provider||r.m.key,(providerCounts.get(r.m.provider||r.m.key)||0)+1));
+    // Related models from the same provider (e.g. MeteoSwiss CH1 + CH2) share their provider weight,
+    // so they improve resolution/consistency without counting as two fully independent votes.
+    const wm=k=>weightedMean(rows.map(r=>({value:r[k],weight:r.m.weight/(providerCounts.get(r.m.provider||r.m.key)||1)})));
     const cloudVals=vals("cloud"), cloudMin=Math.min(...cloudVals), cloudMax=Math.max(...cloudVals), cloudMean=wm("cloud");
     const cloudRisk=clamp(.55*cloudMean+.45*cloudMax);
     const conservativeLayer=k=>{const a=vals(k);return a.length?clamp(.65*wm(k)+.35*Math.max(...a)):0};
     const windVals=vals("wind"), windMean=wm("wind"), windMax=windVals.length?Math.max(...windVals):windMean;
     const rainVals=vals("rain").map(x=>Math.max(0,x)), wet=rainVals.filter(x=>x>=0.1).length, modelCount=rows.length, maxRain=rainVals.length?Math.max(...rainVals):0;
-    let rainRisk=maxRain<0.05?0:clamp((wet/modelCount)*75+Math.min(25,maxRain*20));
+    const providerRows=[...new Set(rows.map(r=>r.m.provider||r.m.key))];
+    const wetProviders=providerRows.filter(provider=>rows.some(r=>(r.m.provider||r.m.key)===provider && Number.isFinite(r.rain) && r.rain>=0.1)).length;
+    const providerCount=Math.max(1,providerRows.length);
+    let rainRisk=maxRain<0.05?0:clamp((wetProviders/providerCount)*75+Math.min(25,maxRain*20));
     const cloudRange=cloudMax-cloudMin;
     const windRange=windVals.length?Math.max(...windVals)-Math.min(...windVals):0;
-    const mixedRain=wet>0&&wet<modelCount?20:0;
-    const missingPenalty=Math.max(0,3-modelCount)*12;
+    const mixedRain=wetProviders>0&&wetProviders<providerCount?20:0;
+    const missingPenalty=Math.max(0,activeModelConfigs.length-modelCount)*8;
     const confidence=clamp(100-cloudRange*.78-Math.min(18,windRange*1.25)-mixedRain-missingPenalty,5,100);
     const visVals=vals("vis"), visMean=wm("vis"), visMin=visVals.length?Math.min(...visVals):visMean;
     const temp=wm("temp"), humVals=vals("hum"), humMean=wm("hum"), humMax=humVals.length?Math.max(...humVals):humMean;
@@ -798,17 +1180,42 @@ function buildConsensus(models){
   const ref=active.find(m=>m.key==="ecmwf")||active[0];
   return {latitude:place.latitude,longitude:place.longitude,timezone:ref.data.timezone||place.timezone||"UTC",utc_offset_seconds:ref.data.utc_offset_seconds||0,hourly,details};
 }
+function currentNightISOForPlace(){
+  const now=new Date();
+  const tz=weather?.timezone;
+  const today=isoDateInTimeZone(now,tz);
+  if(!weather || !place || typeof SunCalc==="undefined"){
+    return hourInTimeZone(now,tz)<12 ? datePlus(today,-1) : today;
+  }
+  try{
+    const offset=weather.utc_offset_seconds||0;
+    const noon=toInstant(today+"T12:00",offset);
+    const times=SunCalc.getTimes(noon,place.latitude,place.longitude);
+    // Before today's sunrise we are still in the night that began yesterday.
+    if(times.sunrise && !isNaN(times.sunrise) && now < times.sunrise) return datePlus(today,-1);
+  }catch(_){}
+  // Fallback for polar/edge cases where sunrise is unavailable.
+  return hourInTimeZone(now,tz)<8 ? datePlus(today,-1) : today;
+}
+
 async function loadWeather(){
   if(!place) return;
-  setLoading(true); setStatus("AROME, ICON und ECMWF werden verglichen …");
+  loadLightPollution();
+  const region=configureRegionalModels();
+  setLoading(true);
+  const loadingNames=activeModelConfigs.map(m=>m.name).join(", ");
+  setStatus(`${region.label}: ${loadingNames} werden verglichen …`);
   try{
-    modelWeather=await Promise.all(MODEL_CONFIGS.map(fetchOneModel));
+    modelWeather=await Promise.all(activeModelConfigs.map(fetchOneModel));
     if(!modelWeather.some(m=>m.available)) modelWeather=[await fetchBestMatchFallback()];
     weather=buildConsensus(modelWeather);
     if(!weather.hourly?.time?.length) throw new Error("Keine gemeinsamen stündlichen Wetterdaten erhalten.");
+    if(!nightDateUserSelected){
+      nightDate.value=currentNightISOForPlace();
+    }
     render();
     const n=modelWeather.filter(m=>m.available&&!m.fallback).length;
-    setStatus(`Aktualisiert · ${fmtPlace(place)} · ${n||1} Wettermodell${n===1?"":"e"} · konservative Konsensbewertung`);
+    setStatus(`Aktualisiert · ${fmtPlace(place)} · Region ${activeModelRegion.label} · ${n||1} Wettermodell${n===1?"":"e"} aktiv · konservative Konsensbewertung`);
   }catch(e){
     setStatus(`Fehler: ${e.message}. Internetverbindung prüfen.`,true);
   }finally{setLoading(false)}
@@ -1087,6 +1494,10 @@ function diagnosisForNight(all,mode,illum,totalScore,best,filterKey="broadband")
     else push("ok",`☾ Deutlicher Mondeinfluss · ${Math.round(illum*100)} %`);
   } else if(mode==="deep"||mode==="milky") push("good","☾ Mondeinfluss gering");
   if((mode==="deep"||mode==="milky") && filterKey!=="broadband") push("good",`◉ Filter: ${fp.label}`);
+  if((mode==="deep"||mode==="milky") && lightPollution.ready){
+    const li=lightPollution.siteSeverity*fp.lpFactor;
+    push(li>=65?"bad":li>=35?"ok":"good",`✦ Lichtverschmutzung: ${lpLevel(li)}`);
+  }
   if(precip>=40) push("bad",`☂ Regenrisiko bis ${Math.round(precip)} %`);
   else if(precip>=15) push("ok",`☂ Etwas Regenrisiko · bis ${Math.round(precip)} %`);
   if(conf<50) push("bad",`≋ Modelle uneinig · Sicherheit ${Math.round(conf)}`);
@@ -1145,7 +1556,7 @@ function renderNowMarker(all){
 
 function renderTarget(all){
   const key=targetEl.value, card=$("targetCard");
-  if(key==="none"||!TARGETS[key]){card.style.display="none";return}
+  if(key==="none"||!TARGETS[key]){card.style.display="none";lightPollutionTargetAz=null;renderLightPollutionCard();return}
   card.style.display="block";
   const t=TARGETS[key]; $("targetName").textContent=t.name;
   const illum=SunCalc.getMoonIllumination(midnightInstant()).fraction;
@@ -1159,7 +1570,8 @@ function renderTarget(all){
     const sep=angSep(t.ra,t.dec,moon.ra,moon.dec);
     const altitudeFactor=targetAltitudeScore(aa.alt);
     const moonFactor=targetMoonScore(sep,illum,h.moonAlt,mode,filterKey);
-    let combo=h.metrics.total*.60+altitudeFactor*.23+moonFactor*.12+compatibility*.05;
+    const lp=lpImpactForTarget(aa.az,aa.alt,filterKey);
+    let combo=h.metrics.total*.54+altitudeFactor*.20+moonFactor*.11+compatibility*.05+lp.score*.10;
     // Ein Ziel-Score darf schlechte Grundbedingungen nicht wegrechnen.
     combo=Math.min(combo,h.metrics.total+16);
     if(aa.alt<20) combo=Math.min(combo,22);
@@ -1171,19 +1583,29 @@ function renderTarget(all){
     // Narrowband hilft nur bei Linienemission. Für Galaxien und Reflexionsnebel
     // wird ein unpassender Filter deshalb als eigener harter Ziel-Limit berücksichtigt.
     combo=Math.min(combo,compatibility);
-    return {...h,targetAlt:aa.alt,moonSep:sep,targetAltitudeFactor:altitudeFactor,targetMoonFactor:moonFactor,targetScore:clamp(combo)};
+    if((mode==="deep"||mode==="milky") && filterKey==="broadband" && lp.impact>=75) combo=Math.min(combo,62);
+    return {...h,targetAlt:aa.alt,targetAz:aa.az,moonSep:sep,targetAltitudeFactor:altitudeFactor,targetMoonFactor:moonFactor,targetLpImpact:lp.impact,targetLpScore:lp.score,targetScore:clamp(combo)};
   });
-  const visible=rows.filter(h=>h.targetAlt>=20&&h.sunAlt<=-12&&h.metrics.total>=35);
-  const best=[...visible].sort((a,b)=>b.targetScore-a.targetScore)[0]||[...rows].sort((a,b)=>b.targetScore-a.targetScore)[0];
+  // Zielplanung nur innerhalb einer astronomisch sinnvollen Nacht bewerten.
+  // Deep Sky/Milchstraße: Sonne mindestens 12° unter dem Horizont.
+  // Mond/Planeten: nautische/zivile Restdämmerung darf etwas großzügiger sein.
+  const targetDarkLimit=(mode==="deep"||mode==="milky")?-12:-6;
+  const eligible=rows.filter(h=>h.targetAlt>=20&&h.sunAlt<=targetDarkLimit);
+  const visible=eligible.filter(h=>h.metrics.total>=35);
+  // Auch wenn das Wetter schlecht ist, zeigen wir den besten *nächtlichen* Kandidaten –
+  // aber niemals eine Stunde nach Ende der nutzbaren Dunkelheit als "beste Zeit".
+  const best=[...eligible].sort((a,b)=>b.targetScore-a.targetScore)[0]||null;
   const max=[...rows].sort((a,b)=>b.targetAlt-a.targetAlt)[0];
-  const above30=rows.filter(h=>h.targetAlt>=30&&h.sunAlt<=-6).length;
+  const above30=rows.filter(h=>h.targetAlt>=30&&h.sunAlt<=targetDarkLimit).length;
   $("targetMaxAlt").textContent=max?`${Math.round(max.targetAlt)}°`:"–";
   $("targetTransit").textContent=max?max.hour:"–";
   $("targetMoonSep").textContent=best?`${Math.round(best.moonSep)}°`:"–";
   $("targetAbove30").textContent=above30?`${above30} h`:"0 h";
+  $("targetAz").textContent=best?`${compassName(best.targetAz)} · ${Math.round(best.targetAz)}°`:"–";
+  $("targetLp").textContent=best?`${lpLevel(best.targetLpImpact)} · ${Math.round(best.targetLpImpact)}/100`:"–";
   if(visible.length){
     let groups=[],g=[];
-    rows.forEach(h=>{const ok=h.targetAlt>=25&&h.sunAlt<=-12&&h.metrics.total>=35&&h.targetScore>=40;if(ok)g.push(h);else if(g.length){groups.push(g);g=[]}});if(g.length)groups.push(g);
+    rows.forEach(h=>{const ok=h.targetAlt>=25&&h.sunAlt<=targetDarkLimit&&h.metrics.total>=35&&h.targetScore>=40;if(ok)g.push(h);else if(g.length){groups.push(g);g=[]}});if(g.length)groups.push(g);
     groups.sort((a,b)=>avg(b.map(x=>x.targetScore))-avg(a.map(x=>x.targetScore)));
     const bg=groups[0]||visible.slice(0,1);
     const end=localTime(new Date(bg[bg.length-1].instant.getTime()+3600000),weather.timezone);
@@ -1200,39 +1622,51 @@ function renderTarget(all){
       else reasons.push(`sehr heller Mond (${Math.round(illum*100)} %) mit ${Math.round(best.moonSep)}° Abstand`);
     }
     if(filterKey!=="broadband") reasons.push(`${profile.label}: ${compatibilityText(compatibility)} für ${t.name.split(" · ")[0]}`);
+    if(lightPollution.ready) reasons.push(`Lichtglocke ${compassName(best.targetAz)}: ${lpLevel(best.targetLpImpact)}`);
     if(best.metrics.total<45) reasons.push(`Wetter limitiert mit Score ${Math.round(best.metrics.total)}`); else reasons.push(`Wetter-Score ${Math.round(best.metrics.total)}`);
     $("targetWhy").textContent=reasons.join(" · ");
-    $("targetSummary").textContent=`Beste Kombination derzeit ${best.hour}: Zielhöhe ${Math.round(best.targetAlt)}°, Mondabstand ${Math.round(best.moonSep)}°, Wetter ${Math.round(best.metrics.total)}, Ziel-Score ${score}. Der Ziel-Score ist bewusst konservativ und berücksichtigt zusätzlich, ob der gewählte Filter zum Objekttyp passt.`;
+    $("targetSummary").textContent=`Beste Kombination innerhalb der nutzbaren Nacht ${best.hour}: Zielhöhe ${Math.round(best.targetAlt)}°, Azimut ${compassName(best.targetAz)} ${Math.round(best.targetAz)}°, Mondabstand ${Math.round(best.moonSep)}°, Lichtverschmutzung ${Math.round(best.targetLpImpact)}/100, Wetter ${Math.round(best.metrics.total)}, Ziel-Score ${score}. Zeiten nach Ende der nutzbaren Dunkelheit werden ausgeschlossen; Lichtglocke und Filterwirkung werden stündlich mit der Zielrichtung neu berechnet.`;
+    lightPollutionTargetAz=best.targetAz;renderLightPollutionCard(best.targetAz,best.targetLpImpact);
   } else {
     $("targetWhy").textContent="Keine brauchbare Kombination aus Höhe, Dunkelheit und Wetter.";
     $("targetSummary").textContent="Keine Zielfenster berechenbar.";
+    lightPollutionTargetAz=null;renderLightPollutionCard();
   }
 }
 
 
 function renderModelComparison(focus){
+  const grid=$("modelGrid");
+  grid.innerHTML="";
+  $("modelRegionBadge").textContent=`Region: ${activeModelRegion.label}`;
   const stamps=new Set(focus.map(h=>h.stamp));
-  for(const cfg of MODEL_CONFIGS){
+  const configs=activeModelConfigs.length?activeModelConfigs:modelWeather.filter(m=>!m.fallback);
+  for(const cfg of configs){
     const m=modelWeather.find(x=>x.key===cfg.key);
-    const state=$("modelState_"+cfg.key), cloudEl=$("modelCloud_"+cfg.key), rainEl=$("modelRain_"+cfg.key);
-    if(!m?.available){state.textContent="nicht verfügbar";state.className="modelState bad";cloudEl.textContent="–";rainEl.textContent="–";continue}
-    const idx=[...stamps].map(st=>m.index.get(st)).filter(i=>i!=null);
-    const clouds=idx.map(i=>finite(m.data.hourly.cloud_cover?.[i])).filter(Number.isFinite);
-    const rains=idx.map(i=>finite(m.data.hourly.precipitation?.[i])).filter(Number.isFinite);
-    state.textContent=m.fallback?"Fallback":"aktiv";state.className="modelState good";
-    cloudEl.textContent=clouds.length?`${Math.round(avg(clouds))} %`:"–";
-    rainEl.textContent=rains.length?`${Math.max(...rains).toFixed(1)} mm`:"–";
+    const card=document.createElement("div");card.className="modelCard";card.dataset.model=cfg.key;
+    const idx=m?.available?[...stamps].map(st=>m.index.get(st)).filter(i=>i!=null):[];
+    const clouds=m?.available?idx.map(i=>finite(m.data.hourly.cloud_cover?.[i])).filter(Number.isFinite):[];
+    const rains=m?.available?idx.map(i=>finite(m.data.hourly.precipitation?.[i])).filter(Number.isFinite):[];
+    const usable=clouds.length>0;
+    const state=usable?(m.modelId!==cfg.ids[0]?"Fallback":"aktiv"):(m?.available?"außer Horizont":"nicht verfügbar");
+    const stateClass=usable?"good":"bad";
+    const cloudText=usable?`${Math.round(avg(clouds))} %`:"–";
+    const rainText=rains.length?`${Math.max(...rains).toFixed(1)} mm`:"–";
+    card.innerHTML=`<div class="modelTop"><div><div class="modelName">${cfg.name}</div><div class="modelMeta">${cfg.meta||""}</div></div><div class="modelState ${stateClass}">${state}</div></div><div class="modelStats"><div class="modelStat"><span>Wolken</span><b>${cloudText}</b></div><div class="modelStat"><span>Niederschlag max.</span><b>${rainText}</b></div></div>`;
+    grid.appendChild(card);
   }
+  if(!grid.children.length) grid.innerHTML='<div class="empty">Keine regionalen Modelle verfügbar.</div>';
+
   const conf=Math.round(avg(focus.map(h=>h.confidence)));
   const minCloud=Math.round(avg(focus.map(h=>h.cloudMin))), maxCloud=Math.round(avg(focus.map(h=>h.cloudMax)));
   const badge=$("modelConfidenceBadge");badge.textContent=`Prognosesicherheit: ${confidenceName(conf)}`;badge.className=`confidencePill ${confidenceClass(conf)}`;
   $("consensusScore").textContent=isFinite(conf)?conf:"–";
-  const active=modelWeather.filter(m=>m.available).length;
+  const activeInFocus=Math.max(0,...focus.map(h=>h.modelCount||0));
   const wetMax=Math.max(0,...focus.map(h=>h.wetModels||0));
   let msg=conf>=75?"Die Modelle liegen eng beieinander.":conf>=50?"Die Modelle weichen merklich voneinander ab.":"Die Modelle widersprechen sich deutlich – die Nacht ist schwer vorherzusagen.";
-  $("consensusText").innerHTML=`<b>${msg}</b><br>Im besten Fenster reicht die mittlere Wolkenspanne ungefähr von ${minCloud} bis ${maxCloud} %. ${wetMax?`Bis zu ${wetMax} von ${active} Modellen zeigen Niederschlag.`:"Keines der aktiven Modelle zeigt im besten Fenster nennenswerten Niederschlag."}`;
+  const horizonNote=activeInFocus<activeModelConfigs.length?` Für dieses Zeitfenster liefern ${activeInFocus} von ${activeModelConfigs.length} Regionalmodellen Daten; kurzreichweitige hochauflösende Modelle können bei späteren Tagen bereits enden.`:"";
+  $("consensusText").innerHTML=`<b>${msg}</b><br>Im besten Fenster reicht die mittlere Wolkenspanne ungefähr von ${minCloud} bis ${maxCloud} %. ${wetMax?`Bis zu ${wetMax} Modelle zeigen Niederschlag.`:"Keines der aktiven Modelle zeigt im besten Fenster nennenswerten Niederschlag."}${horizonNote}`;
 }
-
 function render(){
   if(!weather || !place || typeof SunCalc==="undefined"){
     if(typeof SunCalc==="undefined") setStatus("SunCalc konnte nicht geladen werden. Internetverbindung prüfen.",true);
@@ -1288,7 +1722,8 @@ function render(){
     ["Tau-Risiko",avg(focus.map(h=>h.metrics.dew))],
     ["Dunkelheit",avg(focus.map(h=>h.metrics.dark))],
     ["Niederschlag",avg(focus.map(h=>h.metrics.precip))],
-    ["Modelluneinigkeit",avg(focus.map(h=>h.metrics.consensus))]
+    ["Modelluneinigkeit",avg(focus.map(h=>h.metrics.consensus))],
+    ["Lichtverschmutzung",avg(focus.map(h=>h.metrics.lp ?? 75))]
   ].sort((a,b)=>a[1]-b[1])[0];
   const strongest=[
     ["wenig Wolken",avg(focus.map(h=>h.metrics.cloud))],
@@ -1346,7 +1781,7 @@ function render(){
 
   const factorMap={
     Cloud:["fCloud","bCloud","cloud"],Moon:["fMoon","bMoon","moon"],Wind:["fWind","bWind","wind"],
-    Dew:["fDew","bDew","dew"],Dark:["fDark","bDark","dark"],Vis:["fVis","bVis","vis"],Precip:["fPrecip","bPrecip","precip"],Consensus:["fConsensus","bConsensus","consensus"]
+    Dew:["fDew","bDew","dew"],Dark:["fDark","bDark","dark"],Vis:["fVis","bVis","vis"],Precip:["fPrecip","bPrecip","precip"],Consensus:["fConsensus","bConsensus","consensus"],LP:["fLP","bLP","lp"]
   };
   const factorHours=all.filter(h=>h.sunAlt<=-12);
   const factorSample=factorHours.length?factorHours:all;
@@ -1356,6 +1791,7 @@ function render(){
     $(bar).style.width=`${val}%`;
   });
   renderModelComparison(focus);
+  renderLightPollutionCard();
   renderTarget(all);
 }
 
@@ -1369,12 +1805,12 @@ document.addEventListener("click",e=>{
 function syncFilterState(){
   const relevant=modeEl.value==="deep"||modeEl.value==="milky";
   filterEl.disabled=!relevant;
-  filterEl.title=relevant?"Der Filter verändert den Mondeinfluss und bei gewähltem Ziel zusätzlich die spektrale Eignung. Wolken und Regen bleiben unverändert.":"Im Mond- und Planetenmodus wird der Aufnahmefilter nicht bewertet.";
+  filterEl.title=relevant?"Der Filter verändert Mond- und Lichtverschmutzungseinfluss und bei gewähltem Ziel zusätzlich die spektrale Eignung. Wolken und Regen bleiben unverändert.":"Im Mond- und Planetenmodus wird der Aufnahmefilter nicht bewertet.";
 }
 modeEl.addEventListener("change",()=>{syncFilterState();weather&&render()});
 targetEl.addEventListener("change",()=>{localStorage.setItem("astroNightTarget",targetEl.value);weather&&render()});
 filterEl.addEventListener("change",()=>{localStorage.setItem("astroNightFilter",filterEl.value);weather&&render()});
-nightDate.addEventListener("change",()=>weather&&render());
+nightDate.addEventListener("change",()=>{nightDateUserSelected=true;weather&&render()});
 try{const savedFilter=localStorage.getItem("astroNightFilter");if(savedFilter&&FILTER_PROFILES[savedFilter]) filterEl.value=savedFilter}catch(_){}
 try{const savedTarget=localStorage.getItem("astroNightTarget");if(savedTarget&&TARGETS[savedTarget]) targetEl.value=savedTarget}catch(_){}
 syncFilterState();
@@ -1382,26 +1818,47 @@ syncFilterState();
 // Move the current-time marker without reloading weather data.
 setInterval(()=>{if(currentNightHours.length) renderNowMarker(currentNightHours)},30000);
 
+renderSavedSites();
+$("editCoordsBtn").addEventListener("click",()=>{
+  coordEditor.classList.contains("open")?closeCoordinateEditor():openCoordinateEditor();
+});
+$("closeCoordsBtn").addEventListener("click",closeCoordinateEditor);
+$("applyCoordsBtn").addEventListener("click",()=>useManualCoordinates(false));
+$("saveCoordsBtn").addEventListener("click",()=>useManualCoordinates(true));
+savedSiteSelect.addEventListener("change",()=>{
+  const id=savedSiteSelect.value;$("deleteSiteBtn").disabled=!id;if(!id)return;
+  const site=getSavedSites().find(x=>(x.id||siteId(x))===id);if(!site)return;
+  place={...site,locationSource:"saved"};locationInput.value=place.name||formatCoordinates(place);persistCurrentPlace();closeCoordinateEditor();loadWeather();
+});
+$("deleteSiteBtn").addEventListener("click",()=>{
+  const id=savedSiteSelect.value;if(!id)return;
+  const sites=getSavedSites();const target=sites.find(x=>(x.id||siteId(x))===id);
+  writeSavedSites(sites.filter(x=>(x.id||siteId(x))!==id));renderSavedSites();
+  setStatus(target?`Beobachtungsplatz „${target.name||"ohne Namen"}“ entfernt.`:"Beobachtungsplatz entfernt.");
+});
+
 $("locateBtn").addEventListener("click",()=>{
   if(!navigator.geolocation){setStatus("Geolocation wird von diesem Browser nicht unterstützt.",true);return}
   setStatus("Standortfreigabe wird angefragt …");
   navigator.geolocation.getCurrentPosition(async pos=>{
-    place=await reversePlace(pos.coords.latitude,pos.coords.longitude);
+    place=await reversePlace(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy);
     locationInput.value="Mein Standort";
-    localStorage.setItem("astroNightPlace",JSON.stringify(place));
+    persistCurrentPlace();
     loadWeather();
   },err=>{
     setStatus("Standort konnte nicht gelesen werden. Du kannst stattdessen einen Ort suchen.",true);
-  },{enableHighAccuracy:false,timeout:8000,maximumAge:600000});
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:120000});
 });
 
 // Restore last location. If none, keep the app neutral rather than guessing.
 try{
   const saved=JSON.parse(localStorage.getItem("astroNightPlace"));
   if(saved && isFinite(saved.latitude) && isFinite(saved.longitude)){
-    place=saved; locationInput.value=fmtPlace(saved); loadWeather();
-  }
-}catch(_){}
+    place=saved;
+    if(!place.locationSource) place.locationSource="saved";
+    locationInput.value=fmtPlace(saved);updateLocationUI();loadWeather();
+  }else updateLocationUI();
+}catch(_){updateLocationUI()}
 })();
 </script>
 </body>
