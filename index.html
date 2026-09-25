@@ -415,10 +415,10 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
         <div class="lpCompassWrap"><canvas class="lpCompass" id="lpCompass" width="520" height="520" aria-label="Lichtglocken-Kompass"></canvas></div>
         <div class="lpInfo">
           <div class="lpStats">
-            <div class="lpStat"><span>Standortbelastung</span><b id="lpSite">–</b></div>
-            <div class="lpStat"><span>Stärkste Lichtglocke</span><b id="lpWorstDir">–</b></div>
+            <div class="lpStat"><span>Standort-Skyglow</span><b id="lpSite">–</b></div>
+            <div class="lpStat"><span>Stärkste Richtung (relativ)</span><b id="lpWorstDir">–</b></div>
             <div class="lpStat"><span>Lokale VIIRS-Radiance</span><b id="lpLocalRad">–</b></div>
-            <div class="lpStat"><span>Zielrichtung</span><b id="lpTargetImpact">kein Ziel</b></div>
+            <div class="lpStat"><span>Zieleinfluss (mit Filter)</span><b id="lpTargetImpact">kein Ziel</b></div>
           </div>
           <div class="lpSummary" id="lpSummary"><b>Relative Analyse:</b> Lichtquellen rund um den Standort werden nach Richtung und Entfernung gewichtet. Die Zielplanung berücksichtigt anschließend, wie hoch und in welcher Richtung das Objekt steht.</div>
           <div class="lpSourceLink" id="lpSource">Datenquelle wird geladen …</div>
@@ -479,7 +479,7 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
           <div class="targetStat"><span>Mondabstand</span><b id="targetMoonSep">–</b></div>
           <div class="targetStat"><span>Über 30°</span><b id="targetAbove30">–</b></div>
           <div class="targetStat"><span>Azimut im besten Moment</span><b id="targetAz">–</b></div>
-          <div class="targetStat"><span>Lichtverschmutzung</span><b id="targetLp">–</b></div>
+          <div class="targetStat"><span>LP-Zieleinfluss</span><b id="targetLp">–</b></div>
         </div>
         <div class="targetSummary" id="targetSummary">–</div>
       </div>
@@ -510,7 +510,7 @@ th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/geotiff@3.1.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/geotiff@3.0.5"></script>
 <script>
 (() => {
 "use strict";
@@ -842,13 +842,29 @@ function lpDirectionAt(az){
   const step=360/LP_BINS, x=((az%360)+360)%360/step, i0=Math.floor(x)%LP_BINS, i1=(i0+1)%LP_BINS, t=x-Math.floor(x);
   return lightPollution.profile[i0]*(1-t)+lightPollution.profile[i1]*t;
 }
+function lpHorizonFactor(alt){
+  // Lichtglocken bleiben in Horizontnähe lange relevant. Erst bei wirklich hohen
+  // Objekten fällt der Richtungsanteil stark ab. Stückweise Interpolation ist hier
+  // absichtlich konservativer als die frühere exponentielle Abschwächung.
+  const a=clamp(Number.isFinite(alt)?alt:0,0,90);
+  const pts=[[0,1],[5,1],[15,.90],[25,.70],[35,.50],[50,.25],[70,.10],[90,.05]];
+  for(let i=1;i<pts.length;i++){
+    if(a<=pts[i][0]){
+      const [x0,y0]=pts[i-1],[x1,y1]=pts[i],t=(a-x0)/(x1-x0);
+      return y0+(y1-y0)*t;
+    }
+  }
+  return .05;
+}
 function lpImpactForTarget(az,alt,filterKey="broadband"){
-  if(!lightPollution.ready) return {impact:25,score:75,dir:25};
+  if(!lightPollution.ready) return {impact:25,score:75,dir:25,horizon:1};
   const p=FILTER_PROFILES[filterKey]||FILTER_PROFILES.broadband;
-  const dir=lpDirectionAt(az), horizon=Math.exp(-Math.max(0,alt)/35);
-  const raw=clamp(lightPollution.siteSeverity*.60 + dir*.65*horizon);
+  const dir=lpDirectionAt(az), horizon=lpHorizonFactor(alt);
+  // Standort-Skyglow ist der Grundpegel; die Richtungsbelastung kommt zusätzlich
+  // dazu und bleibt bei 20–30° Höhe bewusst noch deutlich wirksam.
+  const raw=clamp(lightPollution.siteSeverity*.50 + dir*.75*horizon);
   const impact=clamp(raw*p.lpFactor);
-  return {impact,score:clamp(100-impact),dir};
+  return {impact,score:clamp(100-impact),dir,horizon};
 }
 function lpLevel(x){return x>=78?"sehr hoch":x>=58?"hoch":x>=38?"mittel":x>=20?"gering":"sehr gering"}
 function lpClassForSeverity(x){return x>=65?"bad":x>=35?"ok":"good"}
@@ -877,19 +893,24 @@ function analyzeLightRaster(data,width,height,bbox){
     }
   }
   const localRad=medianFinite(local), siteSeverity=siteSeverityFromRadiance(localRad);
-  return {ready:true,source:"viirs",rawProfile,profile:normalizeLightProfile(rawProfile,siteSeverity),siteSeverity,localRadiance:localRad,error:null};
+  return {ready:true,source:"viirs",rawProfile,profile:normalizeLightProfile(rawProfile,siteSeverity),siteSeverity,siteEstimated:false,localRadiance:localRad,error:null};
 }
 function fallbackLightProfile(){
-  const raw=new Array(LP_BINS).fill(0), local=[]; const step=360/LP_BINS;
+  const raw=new Array(LP_BINS).fill(0); const step=360/LP_BINS;
   for(const [name,lat,lon,power] of FALLBACK_LIGHTS){
     const d=haversineKm(place.latitude,place.longitude,lat,lon); if(d>220) continue;
     const b=bearingDeg(place.latitude,place.longitude,lat,lon);
-    if(d<12) local.push(Math.max(.2,power*5));
     const c=power*38*Math.exp(-d/50)/Math.pow(1+d/22,.65);
     for(let i=0;i<LP_BINS;i++){const diff=angularDiff(b,i*step);if(diff<=55)raw[i]+=c*Math.exp(-.5*(diff/20)**2)}
   }
-  const localRad=local.length?Math.max(...local):.25, siteSeverity=siteSeverityFromRadiance(localRad);
-  return {ready:true,source:"fallback",rawProfile:raw,profile:normalizeLightProfile(raw,siteSeverity),siteSeverity,localRadiance:NaN,error:"VIIRS konnte nicht direkt geladen werden"};
+  // Ohne VIIRS kennen wir die lokale Radiance nicht. Daher nicht mehr den alten
+  // künstlichen Standardwert 0.25 verwenden (der praktisch immer ~9/100 ergab).
+  // Stattdessen eine bewusst vorsichtige Standort-Näherung aus dem gesamten
+  // städtischen Lichtfeld ableiten und im UI ausdrücklich als Schätzung markieren.
+  const abs=raw.map(v=>clamp(100*(1-Math.exp(-v/45))));
+  const peak=Math.max(0,...abs), mean=avg(abs);
+  const siteSeverity=clamp(12 + peak*.30 + mean*.28,15,72);
+  return {ready:true,source:"fallback",rawProfile:raw,profile:normalizeLightProfile(raw,siteSeverity),siteSeverity,siteEstimated:true,localRadiance:NaN,error:"VIIRS konnte nicht direkt geladen werden"};
 }
 function lpCacheKey(){return place?`astroNightLP:${Number(place.latitude).toFixed(2)}:${Number(place.longitude).toFixed(2)}`:""}
 function readLpCache(){
@@ -932,17 +953,19 @@ function renderLightPollutionCard(targetAz=lightPollutionTargetAz,targetImpact=n
   const st=$("lpStatus");if(!st)return;
   if(!lightPollution.ready){st.textContent="VIIRS-Lichtdaten werden geladen …";st.className="lpStatus ok";$("lpSite").textContent="…";$("lpWorstDir").textContent="…";$("lpLocalRad").textContent="…";drawLpCompass();return}
   const max=Math.max(...lightPollution.profile),idx=lightPollution.profile.indexOf(max),az=idx*360/LP_BINS;
-  $("lpSite").textContent=`${lpLevel(lightPollution.siteSeverity)} · ${Math.round(lightPollution.siteSeverity)}/100`;
-  $("lpWorstDir").textContent=`${compassName(az)} · ${Math.round(max)}/100`;
-  $("lpLocalRad").textContent=Number.isFinite(lightPollution.localRadiance)?`${lightPollution.localRadiance.toFixed(2)} nW/cm²/sr`:"nur Fallback";
+  const fallback=lightPollution.source==="fallback";
+  $("lpSite").textContent=fallback?`geschätzt · ${lpLevel(lightPollution.siteSeverity)} · ${Math.round(lightPollution.siteSeverity)}/100`:`${lpLevel(lightPollution.siteSeverity)} · ${Math.round(lightPollution.siteSeverity)}/100`;
+  $("lpWorstDir").textContent=`${compassName(az)} · ${Math.round(max)}/100 relativ`;
+  $("lpLocalRad").textContent=Number.isFinite(lightPollution.localRadiance)?`${lightPollution.localRadiance.toFixed(2)} nW/cm²/sr`:"nicht verfügbar";
   if(Number.isFinite(targetAz)){
     const imp=targetImpact??lpImpactForTarget(targetAz,30,filterEl.value).impact;
     $("lpTargetImpact").textContent=`${compassName(targetAz)} · ${lpLevel(imp)} (${Math.round(imp)})`;
   }else $("lpTargetImpact").textContent="kein Ziel";
-  const fallback=lightPollution.source==="fallback";
   st.textContent=fallback?"Näherungsmodell aktiv":"VIIRS 2024 geladen";st.className=`lpStatus ${fallback?"ok":lpClassForSeverity(lightPollution.siteSeverity)}`;
-  $("lpSummary").innerHTML=`<b>${fallback?"Fallback-Näherung":"VIIRS-basierte Richtungsanalyse"}:</b> Der Standort liegt relativ bei <b>${lpLevel(lightPollution.siteSeverity)}</b> Lichtbelastung. Die stärkste Lichtglocke liegt Richtung <b>${compassName(az)}</b>. Für die Zielbewertung nimmt ihr Einfluss mit zunehmender Objekthöhe ab und wird je nach Filter unterschiedlich stark gewichtet.`;
-  $("lpSource").textContent=fallback?`VIIRS-Zugriff fehlgeschlagen (${lightPollution.error||"unbekannt"}); ersatzweise grobes Städtemodell für Mitteleuropa.`:"Quelle: Annual VNL V2 / VIIRS 2024, ~500 m. Die Lichtglocke ist eine AstroNight-Heuristik aus Oberflächenradiance, Entfernung und Richtung – keine direkte SQM-/Bortle-Messung.";
+  $("lpSummary").innerHTML=fallback
+    ? `<b>Fallback-Näherung:</b> Die absolute Standorthelligkeit ist ohne VIIRS <b>nicht gemessen</b>; ${Math.round(lightPollution.siteSeverity)}/100 ist eine vorsichtige Schätzung aus umliegenden größeren Lichtquellen. <b>${compassName(az)}</b> ist die stärkste <b>relative</b> Richtung. In der Zielbewertung bleibt eine Lichtglocke bis etwa 20–30° Höhe deutlich wirksam und wird erst bei hohen Objekten stark abgeschwächt.`
+    : `<b>VIIRS-basierte Richtungsanalyse:</b> Der Standort-Skyglow liegt relativ bei <b>${lpLevel(lightPollution.siteSeverity)}</b>. Die stärkste relative Lichtglocke liegt Richtung <b>${compassName(az)}</b>. In der Zielbewertung bleibt eine Lichtglocke bis etwa 20–30° Höhe deutlich wirksam und wird je nach Filter unterschiedlich stark gewichtet.`;
+  $("lpSource").textContent=fallback?`VIIRS-Zugriff fehlgeschlagen (${lightPollution.error||"unbekannt"}); ersatzweise grobes Städtemodell für Mitteleuropa. Der Standortwert ist deshalb nur eine konservative Schätzung.`:"Quelle: Annual VNL V2 / VIIRS 2024, ~500 m. Die Lichtglocke ist eine AstroNight-Heuristik aus Oberflächenradiance, Entfernung und Richtung – keine direkte SQM-/Bortle-Messung.";
   drawLpCompass(targetAz);
 }
 
@@ -1622,10 +1645,10 @@ function renderTarget(all){
       else reasons.push(`sehr heller Mond (${Math.round(illum*100)} %) mit ${Math.round(best.moonSep)}° Abstand`);
     }
     if(filterKey!=="broadband") reasons.push(`${profile.label}: ${compatibilityText(compatibility)} für ${t.name.split(" · ")[0]}`);
-    if(lightPollution.ready) reasons.push(`Lichtglocke ${compassName(best.targetAz)}: ${lpLevel(best.targetLpImpact)}`);
+    if(lightPollution.ready) reasons.push(`LP-Zieleinfluss ${compassName(best.targetAz)}: ${lpLevel(best.targetLpImpact)} (${profile.label})`);
     if(best.metrics.total<45) reasons.push(`Wetter limitiert mit Score ${Math.round(best.metrics.total)}`); else reasons.push(`Wetter-Score ${Math.round(best.metrics.total)}`);
     $("targetWhy").textContent=reasons.join(" · ");
-    $("targetSummary").textContent=`Beste Kombination innerhalb der nutzbaren Nacht ${best.hour}: Zielhöhe ${Math.round(best.targetAlt)}°, Azimut ${compassName(best.targetAz)} ${Math.round(best.targetAz)}°, Mondabstand ${Math.round(best.moonSep)}°, Lichtverschmutzung ${Math.round(best.targetLpImpact)}/100, Wetter ${Math.round(best.metrics.total)}, Ziel-Score ${score}. Zeiten nach Ende der nutzbaren Dunkelheit werden ausgeschlossen; Lichtglocke und Filterwirkung werden stündlich mit der Zielrichtung neu berechnet.`;
+    $("targetSummary").textContent=`Beste Kombination innerhalb der nutzbaren Nacht ${best.hour}: Zielhöhe ${Math.round(best.targetAlt)}°, Azimut ${compassName(best.targetAz)} ${Math.round(best.targetAz)}°, Mondabstand ${Math.round(best.moonSep)}°, LP-Zieleinfluss ${Math.round(best.targetLpImpact)}/100 (${profile.label}), Wetter ${Math.round(best.metrics.total)}, Ziel-Score ${score}. Zeiten nach Ende der nutzbaren Dunkelheit werden ausgeschlossen; Lichtglocke, Objekthöhe und Filterwirkung werden stündlich mit der Zielrichtung neu berechnet.`;
     lightPollutionTargetAz=best.targetAz;renderLightPollutionCard(best.targetAz,best.targetLpImpact);
   } else {
     $("targetWhy").textContent="Keine brauchbare Kombination aus Höhe, Dunkelheit und Wetter.";
